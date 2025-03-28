@@ -1,0 +1,94 @@
+// ფერები
+$color-black: #0D0D0D;
+$color-white: #FFFFFF;
+$color-gray-50: #F9FAFB;
+$color-gray-100: #F3F4F6;
+$color-gray-200: #E5E7EB;
+$color-gray-300: #D1D5DB;
+$color-gray-400: #9CA3AF;
+$color-gray-500: #6B7280;
+$color-gray-600: #4B5563;
+$color-gray-700: #374151;
+$color-gray-800: #1F2937;
+$color-gray-900: #111827;
+
+$color-primary-50: #EEF2FF;
+$color-primary-100: #E0E7FF;
+$color-primary-200: #C7D2FE;
+$color-primary-300: #A5B4FC;
+$color-primary-400: #818CF8;
+$color-primary-500: #6366F1;
+$color-primary-600: #4F46E5;
+$color-primary-700: #4338CA;
+$color-primary-800: #3730A3;
+$color-primary-900: #312E81;
+
+$color-secondary-500: #10B981;
+$color-secondary-600: #059669;
+
+$color-accent-500: #F59E0B;
+$color-accent-600: #D97706;
+
+// ფონტები
+$font-sans: 'DM Sans', sans-serif;
+$font-serif: 'Playfair Display', serif;
+$font-mono: 'DM Mono', monospace;
+
+// ფონტის ზომები
+$text-xs: 0.75rem;    // 12px
+$text-sm: 0.875rem;   // 14px
+$text-base: 1rem;     // 16px
+$text-lg: 1.125rem;   // 18px
+$text-xl: 1.25rem;    // 20px
+$text-2xl: 1.5rem;    // 24px
+$text-3xl: 1.875rem;  // 30px
+$text-4xl: 2.25rem;   // 36px
+$text-5xl: 3rem;      // 48px
+$text-6xl: 3.75rem;   // 60px
+$text-7xl: 4.5rem;    // 72px
+$text-8xl: 6rem;      // 96px
+
+// წონები
+$font-thin: 100;
+$font-extralight: 200;
+$font-light: 300;
+$font-normal: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+$font-extrabold: 800;
+$font-black: 900;
+
+// ჩრდილები
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// ტრანზიციები
+$transition-slow: 700ms cubic-bezier(0.22, 1, 0.36, 1);
+$transition-medium: 500ms cubic-bezier(0.22, 1, 0.36, 1);
+$transition-fast: 300ms cubic-bezier(0.22, 1, 0.36, 1);
+
+// ბრეიქპოინტები
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// კონტეინერი
+$container-padding: 1.5rem;
+$container-max-width: 1200px;
+
+// z-ინდექსები
+$z-negative: -1;
+$z-elevate: 1;
+$z-dropdown: 10;
+$z-sticky: 100;
+$z-fixed: 200;
+$z-modal: 300;
+$z-popover: 400;
+$z-tooltip: 500;

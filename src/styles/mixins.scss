@@ -1,0 +1,131 @@
+@import 'variables';
+
+// მედია მოთხოვნები
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == 'md' {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == 'lg' {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == 'xl' {
+    @media (min-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == '2xl' {
+    @media (min-width: $breakpoint-2xl) { @content; }
+  }
+}
+
+// Flexbox ჰელპერები
+@mixin flex($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  flex-wrap: $wrap;
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// გრიდი
+@mixin grid($columns: 1, $gap: 1rem) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+// პოზიციონირება
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin absolute-full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+// ტექსტი და ტიპოგრაფია
+@mixin heading-styles($size, $weight: $font-bold, $line-height: 1.2) {
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $line-height;
+}
+
+@mixin truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin multi-line-truncate($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// გრადიენტები
+@mixin gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@mixin gradient-bg($direction: to right, $start-color: $color-primary-500, $end-color: $color-secondary-500) {
+  background: linear-gradient($direction, $start-color, $end-color);
+}
+
+// ანიმაციები
+@mixin transition($properties: all, $duration: $transition-fast, $easing: cubic-bezier(0.22, 1, 0.36, 1)) {
+  transition-property: $properties;
+  transition-duration: $duration;
+  transition-timing-function: $easing;
+}
+
+// გლასმორფიზმი
+@mixin glass-effect($opacity: 0.1, $blur: 10px) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+}
+
+// კონტეინერი
+@mixin container {
+  width: 100%;
+  max-width: $container-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $container-padding;
+  padding-right: $container-padding;
+}
+
+// ჩრდილები
+@mixin box-shadow($level: 'md') {
+  @if $level == 'sm' {
+    box-shadow: $shadow-sm;
+  } @else if $level == 'md' {
+    box-shadow: $shadow-md;
+  } @else if $level == 'lg' {
+    box-shadow: $shadow-lg;
+  } @else if $level == 'xl' {
+    box-shadow: $shadow-xl;
+  } @else if $level == '2xl' {
+    box-shadow: $shadow-2xl;
+  } @else {
+    box-shadow: $shadow;
+  }
+}
+
+// მომრგვალება
+@mixin rounded($radius: 0.25rem) {
+  border-radius: $radius;
+}
