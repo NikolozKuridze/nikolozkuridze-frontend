@@ -22,19 +22,19 @@ const Projects: React.FC = () => {
         : projectsData.filter(project => project.type === selectedFilter);
 
     const filters = [
-        { id: 'all', label: 'ყველა' },
-        { id: 'web', label: 'ვებ აპლიკაციები' },
-        { id: 'backend', label: 'ბექენდ სისტემები' },
-        { id: 'corporate', label: 'კორპორატიული' },
-        { id: 'financial', label: 'ფინანსური' },
+        { id: 'all', label: 'All' },
+        { id: 'web', label: 'Web Applications' },
+        { id: 'backend', label: 'Backend Systems' },
+        { id: 'corporate', label: 'Corporate' },
+        { id: 'financial', label: 'Financial' },
     ];
 
     return (
         <section className="projects">
             <div className="projects__header">
-                <h2 className="projects__title">პროექტები</h2>
+                <h2 className="projects__title">Projects</h2>
                 <p className="projects__subtitle">
-                    ჩემი გამორჩეული პროექტები, რომლებიც ასახავს .NET დეველოპმენტში ჩემს გამოცდილებას და მიდგომას.
+                    My notable projects showcasing my experience and approach in .NET development
                 </p>
 
                 <div className="projects__filters">
@@ -74,13 +74,13 @@ const Projects: React.FC = () => {
                                 <div className="projects__item-technologies">
                                     {project.technologies.slice(0, 3).map((tech, index) => (
                                         <span key={index} className="projects__item-tech">
-                      {tech}
-                    </span>
+                                            {tech}
+                                        </span>
                                     ))}
                                     {project.technologies.length > 3 && (
                                         <span className="projects__item-tech projects__item-tech--more">
-                      +{project.technologies.length - 3}
-                    </span>
+                                            +{project.technologies.length - 3}
+                                        </span>
                                     )}
                                 </div>
                             </div>
@@ -122,31 +122,31 @@ const Projects: React.FC = () => {
                                 <p>{selectedProject.description}</p>
 
                                 <div className="project-modal__technologies">
-                                    <h4>ტექნოლოგიები:</h4>
+                                    <h4>Technologies:</h4>
                                     <div className="project-modal__tags">
                                         {selectedProject.technologies.map((tech, index) => (
                                             <span key={index} className="project-modal__tag">
-                        {tech}
-                      </span>
+                                                {tech}
+                                            </span>
                                         ))}
                                     </div>
                                 </div>
 
-
-                                href={selectedProject.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="project-modal__link"
+                                <a
+                                    href={selectedProject.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="project-modal__link"
                                 >
-                                პროექტის ნახვა
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
-                                </svg>
-                            </a>
-                        </div>
+                                    View Project
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </motion.div>
                     </motion.div>
-                    </motion.div>
-                    )}
+                )}
             </AnimatePresence>
         </section>
     );

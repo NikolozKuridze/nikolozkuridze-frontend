@@ -1,4 +1,14 @@
-export const projectsData = [
+export interface Project {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    technologies: string[];
+    link: string;
+    type: 'web' | 'backend' | 'corporate' | 'financial';
+}
+ 
+export const projectsData: Project[] = [
     {
         id: 1,
         title: 'სამინისტროს პორტალი',

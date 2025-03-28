@@ -105,7 +105,6 @@ const VideoGallery: React.FC = () => {
                         </button>
                         <div className="video-modal__video-container">
                             <iframe
-                                ref={(el) => (videoRefs.current[activeVideo] = el)}
                                 src={`${videos[activeVideo].url}?autoplay=1&title=0&byline=0&portrait=0`}
                                 allow="autoplay; fullscreen; picture-in-picture"
                                 allowFullScreen
