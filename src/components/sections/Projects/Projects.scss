@@ -1,0 +1,30 @@
+@import '@/styles/variables';
+@import '@/styles/mixins';
+
+.projects {
+  padding: 6rem 0;
+  
+  &__container {
+    @include container;
+  }
+  
+  &__header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+  &__title {
+    font-size: $text-4xl;
+    margin-bottom: 1rem;
+    
+    @include respond-to('md') {
+      font-size: $text-5xl;
+    }
+  }
+  
+  &__subtitle {
+    color: $color-gray-600;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
