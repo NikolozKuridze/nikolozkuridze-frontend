@@ -19,7 +19,7 @@ body {
   color: $color-gray-900;
   font-family: $font-sans;
   font-size: $text-base;
-  font-weight: $font-normal;
+  font-weight: $font-regular; 
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -93,8 +93,8 @@ img, video {
   max-width: $container-max-width;
   margin-left: auto;
   margin-right: auto;
-  padding-left: $container-padding;
-  padding-right: $container-padding;
+  padding-left: $container-padding-x;
+  padding-right: $container-padding-x;
 }
 
 // საერთო კლასები
