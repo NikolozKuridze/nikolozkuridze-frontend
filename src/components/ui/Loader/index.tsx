@@ -1,71 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Loader.scss';
 
-const Loader: React.FC = () => {
+interface LoaderProps {
+    duration?: number;
+}
+
+const Loader: React.FC<LoaderProps> = ({ duration = 2000 }) => {
     const [progress, setProgress] = useState(0);
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(timer);
-                    return 100;
-                }
-                return prev + 5;
-            });
-        }, 50);
+        let startTime: number;
+        let animationFrame: number;
 
-        return () => clearInterval(timer);
-    }, []);
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
 
-    const logoVariants = {
-        hidden: { opacity: 0, scale: 0.8 },
-        visible: {
-            opacity: 1,
-            scale: 1,
-            transition: {
-                duration: 0.5,
-                ease: "easeOut"
+            const elapsed = timestamp - startTime;
+            const nextProgress = Math.min(elapsed / duration * 100, 100);
+
+            setProgress(nextProgress);
+
+            if (elapsed < duration) {
+                animationFrame = requestAnimationFrame(animate);
+            } else {
+                // Fade out the loader
+                setTimeout(() => {
+                    setIsVisible(false);
+                }, 300);
             }
-        }
-    };
+        };
 
-    const progressVariants = {
-        hidden: { width: 0 },
-        visible: {
-            width: `${progress}%`,
-            transition: {
-                duration: 0.1,
-                ease: "easeInOut"
+        animationFrame = requestAnimationFrame(animate);
+
+        return () => {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
             }
-        }
-    };
+        };
+    }, [duration]);
 
     return (
-        <div className="loader">
-            <div className="loader__content">
+        <AnimatePresence>
+            {isVisible && (
                 <motion.div
-                    className="loader__logo"
-                    variants={logoVariants}
-                    initial="hidden"
-                    animate="visible"
+                    className="loader"
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
                 >
-                    NK
+                    <div className="loader__content">
+                        <motion.div
+                            className="loader__logo"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                            NK
+                        </motion.div>
+
+                        <div className="loader__progress-container">
+                            <motion.div
+                                className="loader__progress-bar"
+                                initial={{ width: '0%' }}
+                                animate={{ width: `${progress}%` }}
+                                transition={{ ease: [0.22, 1, 0.36, 1] }}
+                            />
+                        </div>
+
+                        <div className="loader__percentage">
+                            {Math.round(progress)}%
+                        </div>
+                    </div>
                 </motion.div>
-
-                <div className="loader__progress-container">
-                    <motion.div
-                        className="loader__progress-bar"
-                        variants={progressVariants}
-                        initial="hidden"
-                        animate="visible"
-                    />
-                </div>
-
-                <div className="loader__percentage">{progress}%</div>
-            </div>
-        </div>
+            )}
+        </AnimatePresence>
     );
 };
 

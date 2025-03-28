@@ -46,8 +46,8 @@ export default defineConfig({
       scss: {
         includePaths:[path.resolve(__dirname, 'src')],
         additionalData: `
-          @import "./src/styles/variables.scss";
-          @import "./src/styles/mixins.scss";
+          @import "@/styles/variables";
+          @import "@/styles/mixins";
         `,
       },
     },

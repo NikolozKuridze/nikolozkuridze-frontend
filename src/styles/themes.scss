@@ -1,0 +1,66 @@
+:root {
+  // Light theme default
+  --color-bg-primary: #{$color-white};
+  --color-bg-secondary: #{$color-gray-50};
+  --color-bg-tertiary: #{$color-gray-100};
+
+  --color-text-primary: #{$color-gray-900};
+  --color-text-secondary: #{$color-gray-700};
+  --color-text-tertiary: #{$color-gray-500};
+  --color-text-heading: #{$color-gray-900};
+
+  --color-border-primary: #{$color-gray-200};
+  --color-border-secondary: #{$color-gray-300};
+
+  --color-card-bg: #{$color-white};
+
+  --color-button-primary: #{$color-primary-600};
+  --color-button-primary-hover: #{$color-primary-700};
+  --color-button-primary-active: #{$color-primary-800};
+  --color-button-primary-text: #{$color-white};
+
+  --color-button-secondary-text: #{$color-primary-600};
+  --color-button-secondary-border: #{$color-primary-200};
+  --color-button-secondary-hover: #{$color-primary-50};
+  --color-button-secondary-hover-border: #{$color-primary-400};
+  --color-button-secondary-active: #{$color-primary-100};
+
+  --color-button-text: #{$color-primary-600};
+  --color-button-text-hover: #{$color-primary-700};
+  --color-button-text-hover-bg: #{$color-primary-50};
+
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --color-bg-primary: #{$color-gray-900};
+  --color-bg-secondary: #{$color-gray-800};
+  --color-bg-tertiary: #{$color-gray-700};
+
+  --color-text-primary: #{$color-gray-100};
+  --color-text-secondary: #{$color-gray-300};
+  --color-text-tertiary: #{$color-gray-400};
+  --color-text-heading: #{$color-white};
+
+  --color-border-primary: #{$color-gray-700};
+  --color-border-secondary: #{$color-gray-600};
+
+  --color-card-bg: #{$color-gray-800};
+
+  --color-button-primary: #{$color-primary-500};
+  --color-button-primary-hover: #{$color-primary-600};
+  --color-button-primary-active: #{$color-primary-700};
+  --color-button-primary-text: #{$color-white};
+
+  --color-button-secondary-text: #{$color-primary-400};
+  --color-button-secondary-border: #{$color-primary-800};
+  --color-button-secondary-hover: rgba(#{$color-primary-900}, 0.5);
+  --color-button-secondary-hover-border: #{$color-primary-600};
+  --color-button-secondary-active: rgba(#{$color-primary-800}, 0.8);
+
+  --color-button-text: #{$color-primary-400};
+  --color-button-text-hover: #{$color-primary-300};
+  --color-button-text-hover-bg: rgba(#{$color-primary-800}, 0.5);
+
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}

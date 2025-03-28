@@ -1,0 +1,187 @@
+@import '@/styles/variables';
+@import '@/styles/mixins';
+
+.experience {
+  padding: 6rem 0;
+  background-color: $color-gray-50;
+
+  &__container {
+    @include container;
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  &__title {
+    font-size: $text-4xl;
+    color: $color-gray-900;
+    margin-bottom: 1rem;
+
+    @include respond-to('md') {
+      font-size: $text-5xl;
+    }
+  }
+
+  &__subtitle {
+    color: $color-gray-600;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  &__timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: $color-gray-300;
+
+      @include respond-to('md') {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  }
+
+  &__item {
+    position: relative;
+    margin-bottom: 3rem;
+    padding-left: 2rem;
+
+    @include respond-to('md') {
+      padding-left: 0;
+      width: 45%;
+      margin-left: auto;
+
+      &:nth-child(odd) {
+        margin-left: 0;
+        margin-right: auto;
+        text-align: right;
+      }
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: $color-primary-500;
+      border: 2px solid $color-white;
+
+      @include respond-to('md') {
+        left: auto;
+        right: -34px;
+      }
+
+      @include respond-to('md') {
+        :nth-child(odd) & {
+          right: auto;
+          left: -34px;
+        }
+      }
+    }
+  }
+
+  &__item-header {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    @include respond-to('md') {
+      :nth-child(odd) & {
+        align-items: flex-end;
+      }
+    }
+  }
+
+  &__item-title {
+    h3 {
+      font-size: $text-xl;
+      font-weight: $font-semibold;
+      color: $color-gray-900;
+      margin-bottom: 0.25rem;
+    }
+
+    h4 {
+      font-size: $text-base;
+      font-weight: $font-medium;
+      color: $color-primary-600;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &__item-date {
+    font-size: $text-sm;
+    color: $color-gray-500;
+
+    span {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  &__item-content {
+    background-color: $color-white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: $shadow-md;
+  }
+
+  &__item-responsibilities {
+    margin-bottom: 1.5rem;
+    padding-left: 1.25rem;
+
+    li {
+      margin-bottom: 0.75rem;
+      position: relative;
+      line-height: 1.5;
+      color: $color-gray-700;
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: -1.25rem;
+        color: $color-primary-500;
+      }
+    }
+
+    @include respond-to('md') {
+      :nth-child(odd) & {
+        padding-left: 0;
+        padding-right: 1.25rem;
+
+        li::before {
+          left: auto;
+          right: -1.25rem;
+        }
+      }
+    }
+  }
+
+  &__item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__item-tag {
+    background-color: $color-primary-50;
+    color: $color-primary-700;
+    font-size: $text-xs;
+    font-weight: $font-medium;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+}
