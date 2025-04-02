@@ -10,10 +10,10 @@
  * 2. Run with: node fix-sass.js
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { resolve, dirname, basename } from 'path';
-import { fileURLToPath } from 'url';
-import { glob } from 'glob';
+import {readFileSync, writeFileSync, existsSync, mkdirSync} from 'fs';
+import {resolve, dirname, basename} from 'path';
+import {fileURLToPath} from 'url';
+import {glob} from 'glob';
 
 // Get current directory (equivalent to __dirname in CommonJS)
 const __filename = fileURLToPath(import.meta.url);
@@ -55,16 +55,16 @@ componentsWithMissingStyles.forEach(file => {
 
     // Create directory if it doesn't exist
     if (!existsSync(dir)) {
-        mkdirSync(dir, { recursive: true });
+        mkdirSync(dir, {recursive: true});
     }
 
     // Create the file with basic imports if it doesn't exist
     if (!existsSync(file)) {
         const content = `@import '@/styles/variables';
 @import '@/styles/mixins';
+@import '@/styles/themes';
 
-.${basename(file, '.scss').toLowerCase()} {
-  padding: 6rem 0;
+.${basename(file, '.scss').toLowerCase()} {  padding: 6rem 0;
   
   &__container {
     @include container;
@@ -88,9 +88,9 @@ componentsWithMissingStyles.forEach(file => {
     color: $color-gray-600;
     max-width: 600px;
     margin: 0 auto;
-  }
-}
-`;
+  } 
+}`;
+
         writeFileSync(file, content, 'utf8');
         console.log(`Created ${file}`);
     }

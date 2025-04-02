@@ -48,6 +48,7 @@ export default defineConfig({
         additionalData: `
           @import "@/styles/variables";
           @import "@/styles/mixins";
+          @import "@/styles/themes";
         `,
       },
     },
