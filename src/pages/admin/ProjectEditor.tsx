@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminApi } from '../../store/adminStore';
@@ -42,13 +42,7 @@ export default function ProjectEditor() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
-  useEffect(() => {
-    if (isEdit) {
-      fetchProject();
-    }
-  }, [id]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       const response = await adminApi.get(`/projects/${id}`);
       const project = response.data.project;
@@ -60,7 +54,13 @@ export default function ProjectEditor() {
       console.error('Error fetching project:', error);
       alert(t('admin.common.error'));
     }
-  };
+  }, [id, t]);
+
+  useEffect(() => {
+    if (isEdit) {
+      fetchProject();
+    }
+  }, [isEdit, fetchProject]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
