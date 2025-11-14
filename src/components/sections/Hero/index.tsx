@@ -21,17 +21,18 @@ const Hero: React.FC = () => {
 
     // Handle video loading
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.addEventListener('loadeddata', () => {
-                setIsVideoLoaded(true);
-            });
+        const video = videoRef.current;
+        const handleLoadedData = () => {
+            setIsVideoLoaded(true);
+        };
+
+        if (video) {
+            video.addEventListener('loadeddata', handleLoadedData);
         }
 
         return () => {
-            if (videoRef.current) {
-                videoRef.current.removeEventListener('loadeddata', () => {
-                    setIsVideoLoaded(true);
-                });
+            if (video) {
+                video.removeEventListener('loadeddata', handleLoadedData);
             }
         };
     }, []);

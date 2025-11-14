@@ -1,7 +1,16 @@
+export interface VariantProperties {
+    opacity?: number;
+    x?: number;
+    y?: number;
+    scale?: number;
+    rotate?: number;
+    [key: string]: unknown;
+}
+
 export interface AnimationVariants {
-    hidden: any;
-    visible: any;
-    exit?: any;
+    hidden: VariantProperties;
+    visible: VariantProperties;
+    exit?: VariantProperties;
 }
 
 export interface TransitionProps {
