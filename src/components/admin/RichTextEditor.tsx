@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 import 'prismjs/themes/prism-tomorrow.css';
 import Prism from 'prismjs';
 
@@ -21,60 +21,75 @@ interface RichTextEditorProps {
 }
 
 export default function RichTextEditor({ value, onChange }: RichTextEditorProps) {
-  const quillRef = useRef<ReactQuill>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const quillInstanceRef = useRef<Quill | null>(null);
+
+  useEffect(() => {
+    if (!editorRef.current || quillInstanceRef.current) return;
+
+    // Initialize Quill
+    const quill = new Quill(editorRef.current, {
+      theme: 'snow',
+      placeholder: 'Write your blog content here...',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+          [{ font: [] }],
+          [{ size: ['small', false, 'large', 'huge'] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ color: [] }, { background: [] }],
+          [{ script: 'sub' }, { script: 'super' }],
+          ['blockquote', 'code-block'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          [{ indent: '-1' }, { indent: '+1' }],
+          [{ align: [] }],
+          ['link', 'image', 'video'],
+          ['clean']
+        ],
+        syntax: {
+          highlight: (text: string) => Prism.highlight(text, Prism.languages.javascript, 'javascript')
+        }
+      }
+    });
+
+    quillInstanceRef.current = quill;
+
+    // Set initial value
+    if (value) {
+      quill.root.innerHTML = value;
+    }
+
+    // Handle text changes
+    quill.on('text-change', () => {
+      const html = quill.root.innerHTML;
+      onChange(html);
+    });
+
+    return () => {
+      quillInstanceRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Update content when value changes externally
+    if (quillInstanceRef.current && value !== quillInstanceRef.current.root.innerHTML) {
+      const selection = quillInstanceRef.current.getSelection();
+      quillInstanceRef.current.root.innerHTML = value;
+      if (selection) {
+        quillInstanceRef.current.setSelection(selection);
+      }
+    }
+  }, [value]);
 
   useEffect(() => {
     // Highlight code blocks
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      const codeBlocks = editor.container.querySelectorAll('pre');
+    if (quillInstanceRef.current) {
+      const codeBlocks = quillInstanceRef.current.container.querySelectorAll('pre');
       codeBlocks.forEach((block) => {
         Prism.highlightElement(block);
       });
     }
   }, [value]);
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      [{ font: [] }],
-      [{ size: ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ color: [] }, { background: [] }],
-      [{ script: 'sub' }, { script: 'super' }],
-      ['blockquote', 'code-block'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      [{ align: [] }],
-      ['link', 'image', 'video'],
-      ['clean']
-    ],
-    syntax: {
-      highlight: (text: string) => Prism.highlight(text, Prism.languages.javascript, 'javascript')
-    }
-  };
-
-  const formats = [
-    'header',
-    'font',
-    'size',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'color',
-    'background',
-    'script',
-    'blockquote',
-    'code-block',
-    'list',
-    'bullet',
-    'indent',
-    'align',
-    'link',
-    'image',
-    'video'
-  ];
 
   return (
     <div className="rich-text-editor">
@@ -139,15 +154,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
           border-radius: 0.25rem;
         }
       `}</style>
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder="Write your blog content here..."
-      />
+      <div ref={editorRef} />
     </div>
   );
 }
