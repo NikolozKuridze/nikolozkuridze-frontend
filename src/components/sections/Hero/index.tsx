@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { ArrowRight, Sparkles, Code2, Award, ChevronDown } from 'lucide-react';
 import './Hero.scss';
 
 const Hero: React.FC = () => {
@@ -94,6 +95,16 @@ const Hero: React.FC = () => {
                     transition={{ duration: 0.8, delay: 0.5 }}
                 >
                     <motion.div
+                        className="hero__badge"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200 }}
+                    >
+                        <Sparkles className="hero__badge-icon" size={16} />
+                        <span>Solution Architect</span>
+                    </motion.div>
+
+                    <motion.div
                         className="hero__heading"
                         initial={{ y: 50, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -101,7 +112,9 @@ const Hero: React.FC = () => {
                     >
                         <h1 className="hero__title">
                             <span className="hero__name">Nikoloz Kuridze</span>
-                            <span className="hero__occupation">Senior .NET Developer</span>
+                            <span className="hero__occupation">
+                                <span className="hero__occupation-highlight">Enterprise</span> Solution Architect
+                            </span>
                         </h1>
                     </motion.div>
 
@@ -111,24 +124,45 @@ const Hero: React.FC = () => {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.9 }}
                     >
-                        Specializing in high-performance, secure software solutions with a creative approach to technical challenges.
+                        Architecting mission-critical enterprise systems with .NET excellence.
+                        Specializing in cloud-native solutions, microservices architecture, and high-performance distributed systems.
                     </motion.p>
+
+                    <motion.div
+                        className="hero__stats"
+                        initial={{ y: 30, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 1.0 }}
+                    >
+                        <div className="hero__stat">
+                            <Code2 size={20} />
+                            <div className="hero__stat-content">
+                                <span className="hero__stat-number">5+</span>
+                                <span className="hero__stat-label">Years Experience</span>
+                            </div>
+                        </div>
+                        <div className="hero__stat">
+                            <Award size={20} />
+                            <div className="hero__stat-content">
+                                <span className="hero__stat-number">200+</span>
+                                <span className="hero__stat-label">Projects Delivered</span>
+                            </div>
+                        </div>
+                    </motion.div>
 
                     <motion.div
                         className="hero__cta"
                         initial={{ y: 30, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 1.1 }}
+                        transition={{ duration: 0.8, delay: 1.2 }}
                     >
                         <Link to="/projects" className="hero__button hero__button--primary">
-                            View Projects
-                            <svg className="hero__button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            <span>View Projects</span>
+                            <ArrowRight className="hero__button-icon" size={20} />
                         </Link>
 
                         <Link to="/contact" className="hero__button hero__button--secondary">
-                            Get in Touch
+                            <span>Let's Connect</span>
                         </Link>
                     </motion.div>
                 </motion.div>
@@ -140,10 +174,8 @@ const Hero: React.FC = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.5, duration: 1 }}
             >
-                <div className="hero__mouse">
-                    <div className="hero__scroll"></div>
-                </div>
-                <p>Scroll Down</p>
+                <ChevronDown className="hero__scroll-icon" size={24} />
+                <p>Scroll to Explore</p>
             </motion.div>
         </section>
     );

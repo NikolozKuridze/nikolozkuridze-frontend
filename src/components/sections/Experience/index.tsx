@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { Briefcase, MapPin, Calendar, TrendingUp } from 'lucide-react';
 import { experienceData } from '../../../constants/experience';
 import './Experience.scss';
 
@@ -21,11 +22,35 @@ const Experience: React.FC = () => {
             style={{ opacity, scale }}
         >
             <div className="experience__header">
-                <h2 className="experience__title">პროფესიული გამოცდილება</h2>
-                <p className="experience__subtitle">
-                    თითოეული როლი მაძლევდა საშუალებას შემექმნა ინოვაციური გადაწყვეტილებები
-                    რთული პრობლემებისთვის.
-                </p>
+                <motion.div
+                    className="experience__badge"
+                    initial={{ scale: 0, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                >
+                    <TrendingUp size={16} />
+                    <span>Career Journey</span>
+                </motion.div>
+                <motion.h2
+                    className="experience__title"
+                    initial={{ y: 30, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                >
+                    Professional Experience
+                </motion.h2>
+                <motion.p
+                    className="experience__subtitle"
+                    initial={{ y: 20, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    Architecting enterprise solutions and leading digital transformation across
+                    banking, government, and technology sectors.
+                </motion.p>
             </div>
 
             <div className="experience__timeline">
@@ -38,27 +63,57 @@ const Experience: React.FC = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
+                        <div className="experience__item-accent"></div>
                         <div className="experience__item-header">
                             <div className="experience__item-title">
-                                <h3>{job.role}</h3>
-                                <h4>{job.company}</h4>
+                                <div className="experience__item-icon">
+                                    <Briefcase size={24} />
+                                </div>
+                                <div>
+                                    <h3>{job.role}</h3>
+                                    <h4>{job.company}</h4>
+                                </div>
                             </div>
-                            <div className="experience__item-date">
-                                <span>{job.period}</span>
-                                <span>{job.location}</span>
+                            <div className="experience__item-meta">
+                                <div className="experience__item-meta-item">
+                                    <Calendar size={16} />
+                                    <span>{job.period}</span>
+                                </div>
+                                <div className="experience__item-meta-item">
+                                    <MapPin size={16} />
+                                    <span>{job.location}</span>
+                                </div>
                             </div>
                         </div>
 
                         <div className="experience__item-content">
                             <ul className="experience__item-responsibilities">
                                 {job.responsibilities.map((responsibility, idx) => (
-                                    <li key={idx}>{responsibility}</li>
+                                    <motion.li
+                                        key={idx}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.4, delay: 0.3 + idx * 0.05 }}
+                                    >
+                                        {responsibility}
+                                    </motion.li>
                                 ))}
                             </ul>
 
                             <div className="experience__item-tags">
                                 {job.technologies.map((tech, idx) => (
-                                    <span key={idx} className="experience__item-tag">{tech}</span>
+                                    <motion.span
+                                        key={idx}
+                                        className="experience__item-tag"
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        whileInView={{ opacity: 1, scale: 1 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.3, delay: 0.5 + idx * 0.03 }}
+                                        whileHover={{ scale: 1.05, y: -2 }}
+                                    >
+                                        {tech}
+                                    </motion.span>
                                 ))}
                             </div>
                         </div>
