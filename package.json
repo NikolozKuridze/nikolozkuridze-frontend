@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "start": "vite preview --port 2169 --host 0.0.0.0",
     "test": "npm run lint && npm run type-check",
     "type-check": "tsc -b"
   },
