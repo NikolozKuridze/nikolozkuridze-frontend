@@ -1,12 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Sparkles, Rocket, Globe } from 'lucide-react';
+import { ArrowRight, Zap, Code2, Database } from 'lucide-react';
 import { profile } from '../../data/profile';
 import './Hero.css';
 
 export const Hero = () => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   const scrollToSection = (id: string) => {
@@ -18,97 +17,35 @@ export const Hero = () => {
 
   return (
     <section id="home" className="hero">
-      {/* NASA-Inspired Space Background */}
+      {/* High-Tech Background */}
       <div className="hero__background">
-        <div className="hero__space-layer"></div>
-        <div className="hero__stars hero__stars--1"></div>
-        <div className="hero__stars hero__stars--2"></div>
-        <div className="hero__stars hero__stars--3"></div>
+        <div className="hero__tech-grid"></div>
+        <div className="hero__circuit-pattern"></div>
+        <div className="hero__gradient-orbs"></div>
 
-        {/* Animated Earth/Globe */}
-        <motion.div
-          className="hero__earth"
-          style={{ y: y1 }}
-          animate={{
-            rotate: 360,
-          }}
-          transition={{
-            rotate: { duration: 200, repeat: Infinity, ease: "linear" }
-          }}
-        >
-          <div className="hero__earth-inner">
-            <Globe className="hero__earth-icon" size={120} />
-          </div>
-          <div className="hero__earth-glow"></div>
-        </motion.div>
-
-        {/* Floating Satellites */}
-        <motion.div
-          className="hero__satellite hero__satellite--1"
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -30, 0],
-            rotate: [0, 15, 0]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <Rocket size={32} />
-        </motion.div>
-
-        <motion.div
-          className="hero__satellite hero__satellite--2"
-          animate={{
-            x: [0, -40, 0],
-            y: [0, 40, 0],
-            rotate: [0, -20, 0]
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        >
-          <Rocket size={24} />
-        </motion.div>
-
-        {/* Nebula effects */}
-        <div className="hero__nebula hero__nebula--1"></div>
-        <div className="hero__nebula hero__nebula--2"></div>
-        <div className="hero__nebula hero__nebula--3"></div>
-
-        {/* Grid overlay */}
-        <div className="hero__grid-overlay"></div>
-      </div>
-
-      {/* Animated particles */}
-      <div className="hero__particles">
-        {[...Array(30)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="hero__particle"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              scale: Math.random() * 0.5 + 0.5,
-              opacity: 0,
-            }}
-            animate={{
-              y: [null, Math.random() * -200 - 100],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: Math.random() * 4 + 3,
-              repeat: Infinity,
-              delay: Math.random() * 3,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
+        {/* Animated data streams - optimized */}
+        <div className="hero__data-streams">
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="data-stream"
+              initial={{ x: Math.random() * 100 - 50, opacity: 0 }}
+              animate={{
+                y: [0, -1000],
+                opacity: [0, 0.6, 0],
+              }}
+              transition={{
+                duration: 6 + i,
+                repeat: Infinity,
+                delay: i * 0.8,
+                ease: 'linear',
+              }}
+              style={{
+                left: `${10 + i * 12}%`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <motion.div
@@ -120,17 +57,17 @@ export const Hero = () => {
             className="hero__badge"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3, type: 'spring', bounce: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.2, type: 'spring', bounce: 0.4 }}
           >
-            <Sparkles size={16} />
+            <Zap size={16} />
             <span>{profile.role}</span>
           </motion.div>
 
           <motion.h1
             className="hero__title"
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
             <span className="hero__greeting">Hello, I'm</span>
             <span className="hero__name">{profile.name}</span>
@@ -141,9 +78,9 @@ export const Hero = () => {
 
           <motion.p
             className="hero__description"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.7 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
             {profile.tagline}
             <br />
@@ -152,9 +89,9 @@ export const Hero = () => {
 
           <motion.div
             className="hero__stats"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.9 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
           >
             <motion.div
               className="hero__stat"
@@ -186,14 +123,14 @@ export const Hero = () => {
 
           <motion.div
             className="hero__cta"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.1 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
           >
             <motion.button
               className="btn btn-primary"
               onClick={() => scrollToSection('projects')}
-              whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(99, 102, 241, 0.4)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(14, 165, 233, 0.4)' }}
               whileTap={{ scale: 0.95 }}
             >
               <span>View Projects</span>
@@ -212,40 +149,65 @@ export const Hero = () => {
 
         <motion.div
           className="hero__visual"
-          initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
-          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-          transition={{ duration: 1.2, delay: 0.8 }}
-          style={{ y: y2 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          style={{ y: y1 }}
         >
-          <div className="hero__orb-container">
+          <div className="hero__tech-sphere">
             <motion.div
-              className="hero__orb"
+              className="tech-sphere__core"
               animate={{
-                rotateY: 360,
-                rotateZ: [0, 5, 0, -5, 0]
+                boxShadow: [
+                  '0 0 60px rgba(14, 165, 233, 0.4)',
+                  '0 0 80px rgba(16, 185, 129, 0.6)',
+                  '0 0 60px rgba(14, 165, 233, 0.4)',
+                ],
               }}
               transition={{
-                rotateY: { duration: 20, repeat: Infinity, ease: "linear" },
-                rotateZ: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                duration: 3,
+                repeat: Infinity,
+                ease: 'easeInOut',
               }}
             >
-              <div className="hero__orb-inner"></div>
-              <div className="hero__orb-shine"></div>
+              <div className="tech-sphere__hexagon"></div>
             </motion.div>
 
-            {/* Orbiting rings */}
-            {[1, 2, 3, 4].map((ring) => (
+            {/* Orbiting tech icons */}
+            <motion.div
+              className="tech-icon tech-icon--1"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            >
+              <Code2 size={24} />
+            </motion.div>
+
+            <motion.div
+              className="tech-icon tech-icon--2"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+            >
+              <Database size={24} />
+            </motion.div>
+
+            <motion.div
+              className="tech-icon tech-icon--3"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+            >
+              <Zap size={24} />
+            </motion.div>
+
+            {/* Hexagonal rings */}
+            {[1, 2, 3].map((ring) => (
               <motion.div
                 key={ring}
-                className={`hero__orbit-ring hero__orbit-ring--${ring}`}
-                animate={{ rotateX: 75, rotateZ: 360 }}
+                className={`hex-ring hex-ring--${ring}`}
+                animate={{ rotate: ring % 2 === 0 ? 360 : -360 }}
                 transition={{
-                  rotateZ: {
-                    duration: 20 + ring * 5,
-                    repeat: Infinity,
-                    ease: "linear",
-                    direction: ring % 2 === 0 ? "normal" : "reverse"
-                  }
+                  duration: 15 + ring * 5,
+                  repeat: Infinity,
+                  ease: 'linear',
                 }}
               />
             ))}
@@ -257,7 +219,7 @@ export const Hero = () => {
         className="hero__scroll"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
         onClick={() => scrollToSection('about')}
         whileHover={{ scale: 1.1 }}
       >

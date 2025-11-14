@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
+import { Logo } from '../Logo/Logo';
+import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher';
 import './Navigation.css';
 
 const navItems = [
@@ -57,12 +59,11 @@ export const Navigation = () => {
       >
         <div className="nav__container container">
           <motion.div
-            className="nav__logo"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <span className="nav__logo-text">NK</span>
+            <Logo />
           </motion.div>
 
           <motion.ul
@@ -94,6 +95,7 @@ export const Navigation = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
+            <LanguageSwitcher />
             <ThemeToggle />
             <button
               className="nav__toggle"

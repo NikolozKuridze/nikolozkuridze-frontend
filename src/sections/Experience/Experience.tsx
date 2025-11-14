@@ -94,14 +94,13 @@ export const Experience = () => {
               <motion.div
                 key={exp.id}
                 className={`experience-item ${isEven ? 'experience-item--left' : 'experience-item--right'}`}
-                initial={{ opacity: 0, x: isEven ? -100 : 100, rotateY: isEven ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
+                initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
                 transition={{
-                  duration: 0.8,
-                  delay: index * 0.2,
-                  type: "spring",
-                  stiffness: 80
+                  duration: 0.4,
+                  delay: index * 0.1,
+                  ease: "easeOut"
                 }}
               >
                 {/* Timeline marker */}
@@ -112,21 +111,11 @@ export const Experience = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
                 >
-                  <motion.div
-                    className="marker__outer-ring"
-                    animate={{
-                      rotate: 360,
-                      scale: [1, 1.1, 1]
-                    }}
-                    transition={{
-                      rotate: { duration: 10, repeat: Infinity, ease: "linear" },
-                      scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                    }}
-                  />
+                  <div className="marker__outer-ring" />
                   <motion.div
                     className="marker__inner"
-                    whileHover={{ scale: 1.3, rotate: 180 }}
-                    transition={{ type: "spring", stiffness: 300 }}
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <Briefcase size={20} />
                   </motion.div>
@@ -136,11 +125,10 @@ export const Experience = () => {
                 <motion.div
                   className="experience-item__card"
                   whileHover={{
-                    scale: 1.02,
-                    rotateY: isEven ? 2 : -2,
-                    z: 50
+                    scale: 1.01,
+                    y: -5
                   }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div className="card__glow" />
 
@@ -208,14 +196,14 @@ export const Experience = () => {
                         <motion.li
                           key={hIndex}
                           className="highlight-item"
-                          initial={{ opacity: 0, x: -20 }}
+                          initial={{ opacity: 0, x: -10 }}
                           whileInView={{ opacity: 1, x: 0 }}
                           viewport={{ once: true }}
                           transition={{
-                            duration: 0.4,
-                            delay: index * 0.2 + 0.8 + hIndex * 0.1
+                            duration: 0.3,
+                            delay: hIndex * 0.05
                           }}
-                          whileHover={{ x: 5, backgroundColor: 'rgba(99, 102, 241, 0.05)' }}
+                          whileHover={{ x: 5 }}
                         >
                           <Target size={14} className="highlight-item__icon" />
                           <span className="highlight-item__text">{highlight}</span>
@@ -241,14 +229,13 @@ export const Experience = () => {
                           whileInView={{ opacity: 1, scale: 1 }}
                           viewport={{ once: true }}
                           transition={{
-                            duration: 0.3,
-                            delay: index * 0.2 + 1.1 + techIndex * 0.05,
-                            type: "spring"
+                            duration: 0.2,
+                            delay: techIndex * 0.03,
+                            ease: "easeOut"
                           }}
                           whileHover={{
-                            scale: 1.1,
-                            y: -3,
-                            boxShadow: '0 5px 20px rgba(99, 102, 241, 0.3)'
+                            scale: 1.05,
+                            y: -2
                           }}
                         >
                           {tech}

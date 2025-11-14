@@ -2,14 +2,11 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Mail,
-  MapPin,
   Linkedin,
   Github,
   Send,
   CheckCircle,
   Phone,
-  Calendar,
-  Video,
   MessageSquare,
   Sparkles
 } from 'lucide-react';
@@ -42,30 +39,38 @@ export const Contact = () => {
     }, 3000);
   };
 
+  const contactEmail = 'niko.quridze@gmail.com';
+  const contactPhone = '591212169';
+  const whatsappLink = `https://wa.me/995${contactPhone}`;
+  const telegramLink = `https://t.me/+995${contactPhone}`;
+
   // Quick action CTAs
   const quickActions = [
     {
-      icon: Calendar,
-      title: 'Schedule a Meeting',
-      description: 'Book a 30-min consultation',
-      action: 'Book Now',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      icon: MessageSquare,
+      title: 'WhatsApp',
+      description: 'Chat on WhatsApp',
+      action: 'Open WhatsApp',
+      link: whatsappLink,
+      gradient: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
       delay: 0.2
     },
     {
-      icon: Video,
-      title: 'Virtual Consultation',
-      description: 'Connect via video call',
-      action: 'Start Call',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      icon: Phone,
+      title: 'Call / Viber',
+      description: 'Speak with me directly',
+      action: 'Call Now',
+      link: `tel:+995${contactPhone}`,
+      gradient: 'linear-gradient(135deg, #7360f2 0%, #9c6aff 100%)',
       delay: 0.3
     },
     {
-      icon: Phone,
-      title: 'Quick Chat',
-      description: 'Speak with me directly',
-      action: 'Call Now',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      icon: Send,
+      title: 'Telegram',
+      description: 'Message on Telegram',
+      action: 'Open Telegram',
+      link: telegramLink,
+      gradient: 'linear-gradient(135deg, #0088cc 0%, #229ED9 100%)',
       delay: 0.4
     }
   ];
@@ -176,13 +181,16 @@ export const Contact = () => {
                 </div>
                 <h3 className="quick-action-card__title">{action.title}</h3>
                 <p className="quick-action-card__description">{action.description}</p>
-                <motion.button
+                <motion.a
+                  href={action.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="quick-action-card__button"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {action.action}
-                </motion.button>
+                </motion.a>
               </div>
             </motion.div>
           ))}
@@ -216,9 +224,9 @@ export const Contact = () => {
                 <Mail size={24} className="contact-info-card__icon" />
               </div>
               <h3 className="contact-info-card__title">Email Me</h3>
-              <p className="contact-info-card__text">{profile.email}</p>
+              <p className="contact-info-card__text">{contactEmail}</p>
               <motion.a
-                href={`mailto:${profile.email}`}
+                href={`mailto:${contactEmail}`}
                 className="contact-info-card__link"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -232,10 +240,18 @@ export const Contact = () => {
               whileHover={{ y: -5, boxShadow: '0 20px 60px rgba(99, 102, 241, 0.2)' }}
             >
               <div className="contact-info-card__icon-wrapper">
-                <MapPin size={24} className="contact-info-card__icon" />
+                <Phone size={24} className="contact-info-card__icon" />
               </div>
-              <h3 className="contact-info-card__title">Location</h3>
-              <p className="contact-info-card__text">{profile.location}</p>
+              <h3 className="contact-info-card__title">Phone / Signal</h3>
+              <p className="contact-info-card__text">+995 {contactPhone}</p>
+              <motion.a
+                href={`tel:+995${contactPhone}`}
+                className="contact-info-card__link"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Call Me
+              </motion.a>
             </motion.div>
 
             <motion.div

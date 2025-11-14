@@ -1,0 +1,73 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "experience": "Experience",
+    "achievements": "Achievements",
+    "projects": "Projects",
+    "contact": "Contact",
+    "blog": "Blog"
+  },
+  "hero": {
+    "greeting": "Hello, I'm",
+    "role": "Enterprise Solution Architect",
+    "tagline": "Specialized in architecting robust, scalable enterprise solutions",
+    "description": "With expertise spanning government systems, banking platforms, and fintech innovation",
+    "yearsLabel": "Years Experience",
+    "projectsLabel": "Projects Delivered",
+    "uptimeLabel": "Uptime Achieved",
+    "viewProjects": "View Projects",
+    "letsConnect": "Let's Connect",
+    "scrollToExplore": "Scroll to explore"
+  },
+  "about": {
+    "subtitle": "Who I Am",
+    "title": "About Me",
+    "intro": "Enterprise Solution Architect with deep expertise in building mission-critical systems"
+  },
+  "experience": {
+    "subtitle": "Career Journey",
+    "title": "Professional Experience",
+    "intro": "Over 5 years of architecting enterprise-scale solutions across government, banking, and fintech sectors",
+    "keyAchievements": "Key Achievements",
+    "technologies": "Technologies"
+  },
+  "projects": {
+    "subtitle": "Portfolio",
+    "title": "Featured Projects",
+    "intro": "Selection of impactful projects across various domains",
+    "all": "All",
+    "enterprise": "Enterprise",
+    "financial": "Financial",
+    "aiml": "AI/ML",
+    "webPlatform": "Web Platform"
+  },
+  "contact": {
+    "subtitle": "Get In Touch",
+    "title": "Let's Work Together",
+    "intro": "Ready to discuss your next project or explore collaboration opportunities",
+    "scheduleMeeting": "Schedule a Meeting",
+    "virtualConsultation": "Virtual Consultation",
+    "quickChat": "Quick Chat",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "successTitle": "Message Sent!",
+    "successMessage": "Thank you for reaching out. I'll get back to you soon.",
+    "location": "Location",
+    "social": "Social Links"
+  },
+  "blog": {
+    "title": "Tips & Tricks",
+    "subtitle": "Developer Insights",
+    "readMore": "Read More",
+    "backToBlog": "Back to Blog",
+    "publishedOn": "Published on",
+    "readTime": "min read",
+    "share": "Share",
+    "relatedPosts": "Related Posts"
+  }
+}
