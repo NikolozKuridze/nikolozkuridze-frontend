@@ -8,59 +8,174 @@
   padding: 8rem 0 4rem;
 }
 
+/* NASA-Inspired Space Background */
 .hero__background {
   position: absolute;
   inset: 0;
   overflow: hidden;
   z-index: -1;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
 }
 
-.hero__gradient {
+.hero__space-layer {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(74, 47, 189, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%);
+}
+
+/* Starfield layers */
+.hero__stars {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.hero__stars--1 {
+  background-image: radial-gradient(2px 2px at 20% 30%, white, transparent),
+                    radial-gradient(2px 2px at 60% 70%, white, transparent),
+                    radial-gradient(1px 1px at 50% 50%, white, transparent),
+                    radial-gradient(1px 1px at 80% 10%, white, transparent),
+                    radial-gradient(2px 2px at 90% 60%, white, transparent),
+                    radial-gradient(1px 1px at 33% 80%, white, transparent),
+                    radial-gradient(2px 2px at 10% 90%, white, transparent);
+  background-size: 200% 200%;
+  animation: moveStars 120s linear infinite, twinkle 3s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+.hero__stars--2 {
+  background-image: radial-gradient(1px 1px at 10% 20%, white, transparent),
+                    radial-gradient(1px 1px at 40% 70%, white, transparent),
+                    radial-gradient(1px 1px at 75% 30%, white, transparent),
+                    radial-gradient(1px 1px at 90% 80%, white, transparent),
+                    radial-gradient(1px 1px at 15% 60%, white, transparent),
+                    radial-gradient(1px 1px at 55% 10%, white, transparent);
+  background-size: 250% 250%;
+  animation: moveStars 90s linear infinite, twinkle 4s ease-in-out infinite 1s;
+  opacity: 0.6;
+}
+
+.hero__stars--3 {
+  background-image: radial-gradient(1px 1px at 25% 40%, rgba(255, 255, 255, 0.8), transparent),
+                    radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.7), transparent),
+                    radial-gradient(1px 1px at 85% 55%, rgba(255, 255, 255, 0.9), transparent),
+                    radial-gradient(1px 1px at 45% 85%, rgba(255, 255, 255, 0.6), transparent);
+  background-size: 300% 300%;
+  animation: moveStars 150s linear infinite, twinkle 5s ease-in-out infinite 2s;
+  opacity: 0.5;
+}
+
+/* Animated Earth/Globe */
+.hero__earth {
+  position: absolute;
+  top: 15%;
+  right: 10%;
+  width: 180px;
+  height: 180px;
+  z-index: 0;
+}
+
+.hero__earth-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.3));
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.hero__earth-icon {
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.6));
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.hero__earth-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+  filter: blur(20px);
+}
+
+/* Floating Satellites */
+.hero__satellite {
+  position: absolute;
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.8));
+  z-index: 0;
+}
+
+.hero__satellite--1 {
+  top: 25%;
+  left: 15%;
+  opacity: 0.7;
+}
+
+.hero__satellite--2 {
+  bottom: 30%;
+  right: 20%;
+  opacity: 0.6;
+}
+
+/* Nebula effects */
+.hero__nebula {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.5;
-  animation: float 20s ease-in-out infinite;
+  filter: blur(100px);
+  opacity: 0.4;
+  animation: float 25s ease-in-out infinite;
 }
 
-.hero__gradient--1 {
-  width: 600px;
-  height: 600px;
-  background: var(--color-accent);
-  top: -200px;
-  right: -200px;
+.hero__nebula--1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.5) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
   animation-delay: 0s;
 }
 
-.hero__gradient--2 {
-  width: 500px;
-  height: 500px;
-  background: #8B5CF6;
+.hero__nebula--2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
   bottom: -150px;
   left: -150px;
-  animation-delay: 5s;
+  animation-delay: 8s;
 }
 
-.hero__gradient--3 {
+.hero__nebula--3 {
   width: 400px;
   height: 400px;
-  background: var(--color-gold);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: 10s;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+  top: 40%;
+  left: 40%;
+  animation-delay: 15s;
 }
 
-.hero__grid {
+/* Grid overlay */
+.hero__grid-overlay {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(var(--glass-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
-  opacity: 0.1;
+  opacity: 0.5;
+  animation: gridPulse 10s ease-in-out infinite;
 }
 
+/* Particles */
 .hero__particles {
   position: absolute;
   inset: 0;
@@ -70,13 +185,14 @@
 
 .hero__particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: var(--color-accent);
-  box-shadow: 0 0 10px var(--color-accent);
+  box-shadow: 0 0 15px var(--color-accent);
 }
 
+/* Content */
 .hero__container {
   position: relative;
   z-index: 1;
@@ -95,15 +211,15 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: var(--glass-bg);
+  background: rgba(99, 102, 241, 0.1);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: 50px;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-accent);
   margin-bottom: 2rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
 }
 
 .hero__badge svg {
@@ -122,26 +238,30 @@
   font-size: 1.5rem;
   font-weight: 500;
   color: var(--color-text-secondary);
+  text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
 }
 
 .hero__name {
   font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 800;
-  background: var(--gradient-accent);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.1;
+  filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.4));
 }
 
 .hero__role {
   font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 600;
   color: var(--color-text-primary);
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
 }
 
 .hero__role-highlight {
   color: var(--color-accent);
+  text-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
 }
 
 .hero__description {
@@ -150,6 +270,7 @@
   color: var(--color-text-secondary);
   margin-bottom: 3rem;
   max-width: 600px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .hero__stats {
@@ -162,18 +283,21 @@
 
 .hero__stat {
   text-align: center;
+  cursor: pointer;
+  transition: transform var(--transition-base);
 }
 
 .hero__stat-value {
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   font-weight: 700;
-  background: var(--gradient-accent);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
   margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
 }
 
 .hero__stat-label {
@@ -185,7 +309,7 @@
 .hero__stat-divider {
   width: 1px;
   height: 40px;
-  background: var(--glass-border);
+  background: linear-gradient(to bottom, transparent, rgba(99, 102, 241, 0.5), transparent);
 }
 
 .hero__cta {
@@ -194,58 +318,99 @@
   flex-wrap: wrap;
 }
 
+/* 3D Visual Orb */
 .hero__visual {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  perspective: 1000px;
 }
 
-.hero__sphere {
+.hero__orb-container {
   position: relative;
-  width: 400px;
-  height: 400px;
+  width: 450px;
+  height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
 }
 
-.hero__sphere-inner {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background: var(--gradient-accent);
-  box-shadow:
-    0 0 60px rgba(99, 102, 241, 0.4),
-    0 0 120px rgba(139, 92, 246, 0.2);
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.hero__sphere-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 2px solid var(--color-accent);
-  opacity: 0.3;
-}
-
-.hero__sphere-ring--1 {
+.hero__orb {
+  position: relative;
   width: 250px;
   height: 250px;
-  animation: rotate 20s linear infinite;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 20px 60px rgba(99, 102, 241, 0.6));
 }
 
-.hero__sphere-ring--2 {
-  width: 320px;
-  height: 320px;
-  animation: rotate 30s linear infinite reverse;
+.hero__orb-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+    rgba(255, 255, 255, 0.8),
+    rgba(99, 102, 241, 0.4) 30%,
+    rgba(139, 92, 246, 0.6) 60%,
+    rgba(74, 47, 189, 0.8) 100%);
+  box-shadow:
+    inset 0 0 50px rgba(255, 255, 255, 0.5),
+    inset 20px 0 80px rgba(99, 102, 241, 0.5),
+    inset -20px 0 80px rgba(139, 92, 246, 0.5),
+    0 0 100px rgba(99, 102, 241, 0.4);
+  animation: orbPulse 6s ease-in-out infinite;
 }
 
-.hero__sphere-ring--3 {
-  width: 400px;
-  height: 400px;
-  animation: rotate 40s linear infinite;
+.hero__orb-shine {
+  position: absolute;
+  top: 20%;
+  left: 25%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(15px);
+  animation: shine 4s ease-in-out infinite;
 }
 
+/* Orbiting rings */
+.hero__orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid;
+  transform-style: preserve-3d;
+}
+
+.hero__orbit-ring--1 {
+  width: 300px;
+  height: 300px;
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.hero__orbit-ring--2 {
+  width: 360px;
+  height: 360px;
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+.hero__orbit-ring--3 {
+  width: 420px;
+  height: 420px;
+  border-color: rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.hero__orbit-ring--4 {
+  width: 480px;
+  height: 480px;
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* Scroll indicator */
 .hero__scroll {
   position: absolute;
   bottom: 2rem;
@@ -259,40 +424,91 @@
   color: var(--color-text-tertiary);
   font-size: 0.875rem;
   font-weight: 500;
-  transition: color var(--transition-base);
+  transition: all var(--transition-base);
+  z-index: 10;
 }
 
 .hero__scroll:hover {
-  color: var(--color-text-primary);
+  color: var(--color-accent);
+  transform: translateX(-50%) translateY(-5px);
 }
 
 .hero__scroll-line {
   width: 2px;
   height: 40px;
   background: linear-gradient(to bottom, transparent, var(--color-accent));
-  animation: scrollLine 2s ease-in-out infinite;
+  transform-origin: top;
 }
 
-@keyframes scrollLine {
-  0%, 100% {
+/* Animations */
+@keyframes moveStars {
+  from {
     transform: translateY(0);
-    opacity: 0;
+  }
+  to {
+    transform: translateY(-100px);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
   }
   50% {
-    transform: translateY(10px);
     opacity: 1;
   }
 }
 
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
   }
-  to {
-    transform: rotate(360deg);
+  33% {
+    transform: translate(30px, -30px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
   }
 }
 
+@keyframes gridPulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes orbPulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 50px rgba(255, 255, 255, 0.5),
+      inset 20px 0 80px rgba(99, 102, 241, 0.5),
+      inset -20px 0 80px rgba(139, 92, 246, 0.5),
+      0 0 100px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 60px rgba(255, 255, 255, 0.6),
+      inset 20px 0 100px rgba(99, 102, 241, 0.6),
+      inset -20px 0 100px rgba(139, 92, 246, 0.6),
+      0 0 120px rgba(99, 102, 241, 0.5);
+  }
+}
+
+@keyframes shine {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Responsive */
 @media (max-width: 1024px) {
   .hero__container {
     grid-template-columns: 1fr;
@@ -326,29 +542,31 @@
     order: -1;
   }
 
-  .hero__sphere {
-    width: 300px;
-    height: 300px;
+  .hero__orb-container {
+    width: 350px;
+    height: 350px;
   }
 
-  .hero__sphere-inner {
-    width: 150px;
-    height: 150px;
-  }
-
-  .hero__sphere-ring--1 {
+  .hero__orb {
     width: 200px;
     height: 200px;
   }
 
-  .hero__sphere-ring--2 {
-    width: 250px;
-    height: 250px;
+  .hero__orbit-ring--1 { width: 250px; height: 250px; }
+  .hero__orbit-ring--2 { width: 300px; height: 300px; }
+  .hero__orbit-ring--3 { width: 350px; height: 350px; }
+  .hero__orbit-ring--4 { display: none; }
+
+  .hero__earth {
+    width: 120px;
+    height: 120px;
+    top: 10%;
+    right: 5%;
   }
 
-  .hero__sphere-ring--3 {
-    width: 300px;
-    height: 300px;
+  .hero__earth-icon {
+    width: 80px;
+    height: 80px;
   }
 }
 
@@ -372,5 +590,33 @@
 
   .hero__cta .btn {
     width: 100%;
+  }
+
+  .hero__orb-container {
+    width: 280px;
+    height: 280px;
+  }
+
+  .hero__orb {
+    width: 150px;
+    height: 150px;
+  }
+
+  .hero__orbit-ring--1 { width: 200px; height: 200px; }
+  .hero__orbit-ring--2 { width: 240px; height: 240px; }
+  .hero__orbit-ring--3 { width: 280px; height: 280px; }
+
+  .hero__earth {
+    width: 80px;
+    height: 80px;
+  }
+
+  .hero__earth-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .hero__satellite {
+    display: none;
   }
 }
