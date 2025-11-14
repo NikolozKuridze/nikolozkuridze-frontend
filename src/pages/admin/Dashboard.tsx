@@ -4,6 +4,11 @@ import { adminApi } from '../../store/adminStore';
 import { BookOpen, FolderGit2, Eye, TrendingUp } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 
+interface Blog {
+  views?: number;
+  published: boolean;
+}
+
 export default function AdminDashboard() {
   const { t } = useTranslation();
   const [stats, setStats] = useState({
@@ -26,11 +31,11 @@ export default function AdminDashboard() {
 
       const blogs = blogsRes.data.blogs || [];
       const projects = projectsRes.data.projects || [];
-      const totalViews = blogs.reduce((sum: number, blog: any) => sum + (blog.views || 0), 0);
+      const totalViews = blogs.reduce((sum: number, blog: Blog) => sum + (blog.views || 0), 0);
 
       setStats({
         totalBlogs: blogs.length,
-        publishedBlogs: blogs.filter((b: any) => b.published).length,
+        publishedBlogs: blogs.filter((b: Blog) => b.published).length,
         totalProjects: projects.length,
         totalViews
       });

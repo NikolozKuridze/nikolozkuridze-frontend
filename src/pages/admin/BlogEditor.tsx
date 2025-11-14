@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminApi } from '../../store/adminStore';
@@ -41,13 +41,7 @@ export default function BlogEditor() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
-  useEffect(() => {
-    if (isEdit) {
-      fetchBlog();
-    }
-  }, [id]);
-
-  const fetchBlog = async () => {
+  const fetchBlog = useCallback(async () => {
     try {
       const response = await adminApi.get(`/blogs/${id}`);
       const blog = response.data.blog;
@@ -59,7 +53,13 @@ export default function BlogEditor() {
       console.error('Error fetching blog:', error);
       alert(t('admin.common.error'));
     }
-  };
+  }, [id, t]);
+
+  useEffect(() => {
+    if (isEdit) {
+      fetchBlog();
+    }
+  }, [isEdit, fetchBlog]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

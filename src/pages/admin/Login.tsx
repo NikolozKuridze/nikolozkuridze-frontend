@@ -22,7 +22,7 @@ export default function AdminLogin() {
     try {
       await login(email, password);
       navigate('/admin/dashboard');
-    } catch (err) {
+    } catch {
       setError(t('admin.login.error'));
     } finally {
       setLoading(false);

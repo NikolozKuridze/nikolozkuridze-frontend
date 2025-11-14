@@ -68,6 +68,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     return () => {
       quillInstanceRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

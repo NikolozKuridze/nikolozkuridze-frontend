@@ -40,7 +40,7 @@ export const useAdminStore = create<AdminState>()(
               isAuthenticated: true
             });
           }
-        } catch (error) {
+        } catch {
           throw new Error('Invalid credentials');
         }
       },
@@ -76,7 +76,7 @@ export const useAdminStore = create<AdminState>()(
             return true;
           }
           return false;
-        } catch (error) {
+        } catch {
           set({
             admin: null,
             token: null,
