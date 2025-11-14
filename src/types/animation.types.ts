@@ -1,7 +1,17 @@
+export interface AnimationVariant {
+    opacity?: number;
+    x?: number | string;
+    y?: number | string;
+    scale?: number;
+    rotate?: number;
+    transition?: TransitionProps;
+    [key: string]: unknown;
+}
+
 export interface AnimationVariants {
-    hidden: any;
-    visible: any;
-    exit?: any;
+    hidden: AnimationVariant;
+    visible: AnimationVariant;
+    exit?: AnimationVariant;
 }
 
 export interface TransitionProps {

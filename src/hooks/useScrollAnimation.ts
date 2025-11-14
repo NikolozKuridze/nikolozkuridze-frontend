@@ -13,7 +13,8 @@ const useScrollAnimation = ({
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        if (!ref.current) return;
+        const element = ref.current;
+        if (!element) return;
 
         const observer = new IntersectionObserver(
             ([entry]) => {
@@ -34,12 +35,10 @@ const useScrollAnimation = ({
             }
         );
 
-        observer.observe(ref.current);
+        observer.observe(element);
 
         return () => {
-            if (ref.current) {
-                observer.unobserve(ref.current);
-            }
+            observer.unobserve(element);
         };
     }, [threshold, once]);
 

@@ -64,30 +64,30 @@ class Api {
     }
 
     // მოთხოვნის მეთოდები
-    public async get<T = any>(
+    public async get<T = unknown>(
         url: string,
         config?: ApiRequestConfig
     ): Promise<AxiosResponse<T>> {
         return this.instance.get<T>(url, config);
     }
 
-    public async post<T = any>(
+    public async post<T = unknown>(
         url: string,
-        data?: any,
+        data?: unknown,
         config?: ApiRequestConfig
     ): Promise<AxiosResponse<T>> {
         return this.instance.post<T>(url, data, config);
     }
 
-    public async put<T = any>(
+    public async put<T = unknown>(
         url: string,
-        data?: any,
+        data?: unknown,
         config?: ApiRequestConfig
     ): Promise<AxiosResponse<T>> {
         return this.instance.put<T>(url, data, config);
     }
 
-    public async delete<T = any>(
+    public async delete<T = unknown>(
         url: string,
         config?: ApiRequestConfig
     ): Promise<AxiosResponse<T>> {

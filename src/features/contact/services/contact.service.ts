@@ -7,9 +7,14 @@ export interface ContactFormData {
     message: string;
 }
 
-export const sendContactMessage = async (data: ContactFormData): Promise<any> => {
+export interface ContactResponse {
+    success: boolean;
+    message: string;
+}
+
+export const sendContactMessage = async (data: ContactFormData): Promise<ContactResponse> => {
     try {
-        const response = await api.post('/contact', data);
+        const response = await api.post<ContactResponse>('/contact', data);
         return response.data;
     } catch (error) {
         console.error('Error sending contact message:', error);
