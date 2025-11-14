@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Award, Target, Zap, Users, TrendingUp, Shield, Star, LucideIcon } from 'lucide-react';
+import { Trophy, Award, Target, Zap, Users, TrendingUp, Shield, Star } from 'lucide-react';
 import { achievements } from '../../data/profile';
 import './Achievements.css';
 
-const iconMap: Record<string, React.ComponentType<{ size?: number }> | typeof LucideIcon> = {
+const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
   trophy: Trophy,
   award: Award,
   target: Target,
