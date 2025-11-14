@@ -4,9 +4,15 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load environment variables
 dotenv.config();
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -67,12 +73,24 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
+// Serve static files from the React app (in production)
+// The dist folder should be at the same level as the server folder
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
+
+// Handle client-side routing - serve index.html for all non-API routes
+// This MUST come after API routes and before the 404 handler
+app.get('*', (req, res) => {
+  // Only serve index.html for non-API routes
+  if (!req.path.startsWith('/api/')) {
+    res.sendFile(path.join(distPath, 'index.html'));
+  } else {
+    // If it's an API route that wasn't caught, return 404 JSON
+    res.status(404).json({
+      success: false,
+      message: 'API route not found'
+    });
+  }
 });
 
 // Error handler
