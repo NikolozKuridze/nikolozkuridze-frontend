@@ -3,7 +3,6 @@ import { Navigation } from './components/Navigation/Navigation';
 import { Hero } from './sections/Hero/Hero';
 import { About } from './sections/About/About';
 import { Experience } from './sections/Experience/Experience';
-import { Achievements } from './sections/Achievements/Achievements';
 import { Projects } from './sections/Projects/Projects';
 import { Contact } from './sections/Contact/Contact';
 import { Footer } from './components/Footer/Footer';
@@ -18,7 +17,6 @@ function App() {
           <Hero />
           <About />
           <Experience />
-          <Achievements />
           <Projects />
           <Contact />
         </main>
