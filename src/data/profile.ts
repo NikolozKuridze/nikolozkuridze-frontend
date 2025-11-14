@@ -200,6 +200,141 @@ export const experience = [
   },
 ];
 
+export const achievements = {
+  stats: [
+    {
+      value: '3.7M',
+      label: 'Users Served',
+      icon: 'users',
+    },
+    {
+      value: '99.99%',
+      label: 'System Uptime',
+      icon: 'trending',
+    },
+    {
+      value: '500K+',
+      label: 'Daily Transactions',
+      icon: 'zap',
+    },
+    {
+      value: '200+',
+      label: 'API Integrations',
+      icon: 'target',
+    },
+  ],
+  milestones: [
+    {
+      id: 1,
+      title: 'Enterprise Architecture Excellence',
+      description: 'Architected mission-critical government systems serving 3.7M citizens with 99.99% uptime and Zero Trust security, achieving SOC 2 Type II compliance.',
+      year: '2025',
+      category: 'technical',
+      icon: 'shield',
+      metrics: [
+        { value: '99.99%', label: 'Uptime' },
+        { value: '3.7M', label: 'Users' },
+        { value: '200+', label: 'APIs' },
+      ],
+      tags: ['Cloud Architecture', 'Zero Trust', 'SOC 2', 'Microservices'],
+    },
+    {
+      id: 2,
+      title: 'High-Performance Banking Platform',
+      description: 'Designed and implemented event-driven banking APIs processing 500K+ daily transactions with sub-50ms response times and 99.95% availability.',
+      year: '2024',
+      category: 'technical',
+      icon: 'zap',
+      metrics: [
+        { value: '500K+', label: 'Daily' },
+        { value: '<50ms', label: 'Response' },
+        { value: '99.95%', label: 'Uptime' },
+      ],
+      tags: ['Event Sourcing', 'High Performance', 'Real-time'],
+    },
+    {
+      id: 3,
+      title: 'Technical Leadership & Mentorship',
+      description: 'Mentored 20+ engineers on Clean Architecture, DDD, and microservices patterns, establishing best practices and coding standards across the organization.',
+      year: '2024-2025',
+      category: 'leadership',
+      icon: 'users',
+      metrics: [
+        { value: '20+', label: 'Engineers' },
+        { value: '100%', label: 'Retention' },
+      ],
+      tags: ['Mentorship', 'Clean Architecture', 'DDD', 'Best Practices'],
+    },
+    {
+      id: 4,
+      title: 'DevSecOps Transformation',
+      description: 'Orchestrated DevSecOps pipelines reducing deployment time by 60% while enhancing security posture with automated testing and compliance checks.',
+      year: '2024',
+      category: 'innovation',
+      icon: 'trending',
+      metrics: [
+        { value: '60%', label: 'Faster' },
+        { value: '100%', label: 'Automated' },
+      ],
+      tags: ['DevSecOps', 'CI/CD', 'Automation', 'Security'],
+    },
+    {
+      id: 5,
+      title: 'PSD2 Open Banking Implementation',
+      description: 'Spearheaded PSD2-compliant Open Banking APIs serving 50+ fintech partners with bank-grade OAuth 2.0/OIDC security and comprehensive monitoring.',
+      year: '2023-2024',
+      category: 'technical',
+      icon: 'shield',
+      metrics: [
+        { value: '50+', label: 'Partners' },
+        { value: '10M', label: 'Daily Requests' },
+      ],
+      tags: ['PSD2', 'OAuth 2.0', 'Open Banking', 'Compliance'],
+    },
+    {
+      id: 6,
+      title: 'AI-Powered Recruitment Innovation',
+      description: 'Architected ML.NET-based candidate matching system achieving 85% accuracy and reducing recruitment time by 40%, saving 72+ hours monthly.',
+      year: '2023',
+      category: 'innovation',
+      icon: 'star',
+      metrics: [
+        { value: '85%', label: 'Accuracy' },
+        { value: '40%', label: 'Faster' },
+        { value: '72hrs', label: 'Saved' },
+      ],
+      tags: ['ML.NET', 'AI/ML', 'Automation', 'Innovation'],
+    },
+    {
+      id: 7,
+      title: 'Performance Optimization Excellence',
+      description: 'Reduced critical API response times from 2 seconds to 200ms through advanced caching strategies, achieving 10x performance improvement.',
+      year: '2023',
+      category: 'impact',
+      icon: 'zap',
+      metrics: [
+        { value: '10x', label: 'Faster' },
+        { value: '200ms', label: 'Response' },
+        { value: '70%', label: 'Less Load' },
+      ],
+      tags: ['Performance', 'Optimization', 'Caching', 'Redis'],
+    },
+    {
+      id: 8,
+      title: 'Enterprise Integration Ecosystem',
+      description: 'Established API-first ecosystem serving 200+ government integrations with comprehensive documentation, monitoring, and SLA guarantees.',
+      year: '2024-2025',
+      category: 'impact',
+      icon: 'target',
+      metrics: [
+        { value: '200+', label: 'Integrations' },
+        { value: '99.9%', label: 'SLA' },
+      ],
+      tags: ['API Design', 'Integration', 'Documentation', 'Governance'],
+    },
+  ],
+};
+
 export const projects = [
   {
     id: 1,
