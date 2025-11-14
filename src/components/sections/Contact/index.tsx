@@ -35,7 +35,7 @@ const Contact: React.FC = () => {
             // წარმატებული გაგზავნის სიმულაცია
             setFormStatus({ submitting: false, success: true, error: false });
             setFormData({ name: '', email: '', subject: '', message: '' });
-        } catch (error) {
+        } catch {
             setFormStatus({ submitting: false, success: false, error: true });
         }
     };
