@@ -1,10 +1,16 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
 
 .hero {
   position: relative;
   height: 100vh;
   width: 100%;
-  @include flex(column, center, center);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  background: linear-gradient(135deg, $color-primary-900 0%, $color-gray-900 100%);
 
   &__background {
     position: absolute;
@@ -12,116 +18,166 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
-  }
+    z-index: 0;
 
-  &__fallback {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, $color-primary-900, $color-gray-900);
-    transition: opacity 1s ease;
-
-    &.hidden {
-      opacity: 0;
-    }
-  }
-
-  &__gradient {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-                    to bottom,
-                    rgba($color-gray-900, 0.7) 0%,
-                    rgba($color-gray-900, 0.5) 50%,
-                    rgba($color-gray-900, 0.8) 100%
-    );
-    z-index: 1;
-
-    &::after {
-      content: '';
+    &-gradient {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(
-                      circle at center,
-                      transparent 0%,
-                      rgba($color-gray-900, 0.4) 100%
+      background: linear-gradient(
+        to bottom,
+        rgba($color-gray-900, 0.85) 0%,
+        rgba($color-primary-900, 0.75) 40%,
+        rgba($color-gray-900, 0.9) 100%
       );
+      z-index: 1;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          ellipse at center,
+          transparent 0%,
+          rgba($color-black, 0.5) 100%
+        );
+      }
+
+      // Premium shine effect
+      &::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle at center,
+          rgba($color-accent-gold, 0.03) 0%,
+          transparent 70%
+        );
+        animation: shimmer 15s ease-in-out infinite;
+      }
+    }
+
+    &-fallback {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, $color-primary-900, $color-gray-900);
+      transition: opacity $transition-luxury;
+
+      &--hidden {
+        opacity: 0;
+      }
     }
   }
 
   &__video {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     opacity: 0;
     transition: opacity 1.5s ease;
 
-    &.loaded {
-      opacity: 1;
+    &--loaded {
+      opacity: 0.4;
     }
   }
 
   &__content {
-    @include flex(column, center, center);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 0 1.5rem;
     text-align: center;
     color: $color-white;
     z-index: 2;
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
-    height: 100%;
 
-    @include respond-to('md') {
+    @media (min-width: $breakpoint-md) {
       padding: 0 3rem;
+    }
+
+    &-inner {
+      will-change: transform;
+      transition: transform 0.1s ease-out;
     }
   }
 
-  &__text-container {
-    max-width: 800px;
-    will-change: transform;
-    transition: transform 0.1s ease-out;
+  // Premium badge
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, rgba($color-accent-gold, 0.15), rgba($color-accent-gold, 0.05));
+    border: 1px solid rgba($color-accent-gold, 0.3);
+    border-radius: $radius-full;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: $color-accent-gold;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba($color-accent-gold, 0.2);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+
+    &-icon {
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    @media (min-width: $breakpoint-md) {
+      padding: 0.6rem 1.5rem;
+      font-size: $text-base;
+    }
   }
 
-  &__title {
-    @include flex(column, center, center);
+  &__heading {
     margin-bottom: 1.5rem;
 
-    @include respond-to('md') {
+    @media (min-width: $breakpoint-md) {
       margin-bottom: 2rem;
     }
   }
 
-  &__name {
-    font-family: $font-serif;
-    font-size: $text-5xl;
-    font-weight: $font-bold;
-    margin-bottom: 0.75rem;
-    text-shadow: 0 2px 10px rgba($color-black, 0.3);
-    background: linear-gradient(90deg, $color-white, rgba($color-primary-300, 0.9));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-
-    @include respond-to('md') {
-      font-size: $text-7xl;
-    }
+  &__title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
   }
 
-  &__role {
-    font-size: $text-xl;
-    font-weight: $font-medium;
-    opacity: 0.9;
+  &__name {
+    font-family: $font-display;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(
+      135deg,
+      $color-white 0%,
+      rgba($color-accent-platinum, 0.9) 50%,
+      $color-white 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba($color-accent-gold, 0.3);
     position: relative;
-    display: inline-block;
 
     &::after {
       content: '';
@@ -129,154 +185,324 @@
       bottom: -10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 60px;
+      width: 60%;
       height: 2px;
-      background-color: $color-primary-500;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        $color-accent-gold,
+        transparent
+      );
+      opacity: 0.5;
     }
+  }
 
-    @include respond-to('md') {
-      font-size: $text-2xl;
+  &__occupation {
+    font-family: $font-serif;
+    font-size: clamp(1.25rem, 4vw, 2rem);
+    font-weight: $font-medium;
+    color: rgba($color-white, 0.9);
+    letter-spacing: 0.05em;
+    margin-top: 0.5rem;
+
+    &-highlight {
+      color: $color-accent-gold;
+      font-weight: $font-semibold;
+      position: relative;
+      display: inline-block;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, $color-accent-gold, transparent);
+        opacity: 0.6;
+      }
     }
   }
 
   &__description {
-    font-size: $text-base;
+    font-size: clamp(1rem, 2vw, 1.125rem);
     font-weight: $font-regular;
-    line-height: 1.6;
-    margin-bottom: 2.5rem;
-    max-width: 600px;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
-    opacity: 0.9;
+    color: rgba($color-white, 0.85);
 
-    @include respond-to('md') {
+    @media (min-width: $breakpoint-md) {
       font-size: $text-lg;
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
     }
   }
 
+  // Stats section
+  &__stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    @media (min-width: $breakpoint-md) {
+      gap: 4rem;
+    }
+  }
+
+  &__stat {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba($color-white, 0.05);
+    border: 1px solid rgba($color-accent-gold, 0.2);
+    border-radius: $radius-xl;
+    backdrop-filter: blur(10px);
+    transition: all $transition-smooth;
+
+    &:hover {
+      background: rgba($color-white, 0.08);
+      border-color: rgba($color-accent-gold, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba($color-accent-gold, 0.2);
+    }
+
+    svg {
+      color: $color-accent-gold;
+      flex-shrink: 0;
+    }
+
+    &-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &-number {
+      font-size: $text-2xl;
+      font-weight: $font-bold;
+      font-family: $font-sans;
+      color: $color-white;
+      line-height: 1;
+      background: linear-gradient(135deg, $color-white, $color-accent-platinum);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    &-label {
+      font-size: $text-xs;
+      color: rgba($color-white, 0.7);
+      font-weight: $font-medium;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  // CTA Buttons
   &__cta {
-    @include flex(column, center, center);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
 
-    @include respond-to('md') {
-      @include flex(row, center, center);
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
       gap: 1.5rem;
     }
   }
 
   &__button {
-    padding: 0.9rem 1.8rem;
-    border-radius: 4px;
-    font-weight: $font-medium;
-    transition: all $transition-fast;
-    @include flex(row, center, center);
-    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: $radius-lg;
+    font-size: $text-base;
+    font-weight: $font-semibold;
+    letter-spacing: 0.025em;
+    transition: all $transition-smooth;
     position: relative;
     overflow: hidden;
-    z-index: 1;
+    white-space: nowrap;
 
     &::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
       background: rgba($color-white, 0.1);
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: -1;
+      transform: translate(-50%, -50%);
+      transition: width $transition-smooth, height $transition-smooth;
     }
 
     &:hover::before {
-      transform: translateX(0);
+      width: 300px;
+      height: 300px;
+    }
+
+    span, svg {
+      position: relative;
+      z-index: 1;
     }
 
     &--primary {
-      background-color: $color-primary-600;
-      color: $color-white;
-      box-shadow: 0 4px 15px rgba($color-primary-600, 0.3);
+      background: linear-gradient(135deg, $color-accent-gold 0%, darken($color-accent-gold, 10%) 100%);
+      color: $color-gray-900;
+      box-shadow: 0 8px 24px rgba($color-accent-gold, 0.4);
+      border: 1px solid rgba($color-accent-gold, 0.5);
 
       &:hover {
-        background-color: $color-primary-700;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba($color-primary-600, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 32px rgba($color-accent-gold, 0.5);
       }
 
       &:active {
-        transform: translateY(0);
+        transform: translateY(-1px);
+      }
+
+      .hero__button-icon {
+        transition: transform $transition-smooth;
+      }
+
+      &:hover .hero__button-icon {
+        transform: translateX(4px);
       }
     }
 
     &--secondary {
-      background-color: transparent;
-      border: 1.5px solid rgba($color-white, 0.6);
+      background: transparent;
+      border: 2px solid rgba($color-white, 0.3);
       color: $color-white;
+      backdrop-filter: blur(10px);
 
       &:hover {
-        border-color: $color-white;
-        transform: translateY(-2px);
+        border-color: rgba($color-white, 0.6);
+        background: rgba($color-white, 0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba($color-white, 0.15);
       }
 
       &:active {
-        transform: translateY(0);
+        transform: translateY(-1px);
       }
     }
-  }
 
-  &__button-arrow {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-left: 0.5rem;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-    transition: transform 0.3s ease;
-
-    .hero__button:hover & {
-      transform: translateX(3px);
+    &-icon {
+      flex-shrink: 0;
     }
   }
 
+  // Scroll indicator
   &__scroll-indicator {
     position: absolute;
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    @include flex(column, center, center);
-    color: $color-white;
-    opacity: 0.8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba($color-white, 0.7);
     z-index: 2;
-    transition: opacity 0.3s ease;
+    cursor: pointer;
+    transition: all $transition-smooth;
 
     &:hover {
-      opacity: 1;
+      color: $color-white;
+
+      .hero__scroll-icon {
+        color: $color-accent-gold;
+        transform: translateY(4px);
+      }
     }
 
     p {
-      font-size: $text-sm;
-      margin-top: 0.5rem;
-      font-weight: $font-light;
+      font-size: $text-xs;
+      font-weight: $font-medium;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
     }
   }
 
-  &__mouse {
-    width: 1.5rem;
-    height: 2.5rem;
-    border: 2px solid $color-white;
-    border-radius: 1rem;
-    @include flex(column, flex-start, center);
-    padding-top: 0.5rem;
+  &__scroll-icon {
+    animation: bounce 2s ease-in-out infinite;
+    transition: all $transition-smooth;
   }
+}
 
-  &__scroll {
-    width: 0.375rem;
-    height: 0.375rem;
-    background-color: $color-white;
-    border-radius: 50%;
-    animation: scrollDown 2s ease-in-out infinite;
+// Animations
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-10%, -10%) scale(1.1);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: $breakpoint-md) {
+  .hero {
+    &__badge {
+      font-size: $text-xs;
+      padding: 0.4rem 1rem;
+    }
+
+    &__stats {
+      gap: 1rem;
+    }
+
+    &__stat {
+      padding: 0.75rem 1rem;
+
+      &-number {
+        font-size: $text-xl;
+      }
+    }
+
+    &__button {
+      width: 100%;
+      justify-content: center;
+      padding: 0.875rem 1.5rem;
+    }
+
+    &__scroll-indicator {
+      bottom: 1rem;
+
+      p {
+        font-size: 0.7rem;
+      }
+    }
   }
 }

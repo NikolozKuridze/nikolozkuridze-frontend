@@ -1,5 +1,8 @@
+@import './variables';
+@import './themes';
+@import './mixins';
 
-// რესეტი
+// Global Reset
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -9,6 +12,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -16,19 +20,21 @@ body {
   color: $color-gray-900;
   font-family: $font-sans;
   font-size: $text-base;
-  font-weight: $font-regular; 
-  line-height: 1.5;
+  font-weight: $font-regular;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-// ტიპოგრაფია
+// Premium Typography
 h1, h2, h3, h4, h5, h6 {
-  font-family: $font-serif;
+  font-family: $font-display;
   font-weight: $font-bold;
   line-height: 1.2;
   margin-bottom: 1rem;
+  letter-spacing: -0.01em;
 }
 
 h1 {
@@ -62,10 +68,16 @@ p {
 a {
   color: $color-primary-600;
   text-decoration: none;
-  transition: color $transition-fast;
+  transition: all $transition-smooth;
 
   &:hover {
-    color: $color-primary-700;
+    color: $color-accent-gold;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent-gold;
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
@@ -76,6 +88,13 @@ button {
   font-family: inherit;
   font-size: inherit;
   padding: 0;
+  transition: all $transition-smooth;
+
+  &:focus-visible {
+    outline: 2px solid $color-accent-gold;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
 img, video {
@@ -119,22 +138,29 @@ img, video {
   border-width: 0;
 }
 
-// სკროლბარი
+// Premium Scrollbar
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: $color-gray-200;
+  background: $color-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: $color-gray-400;
-  border-radius: 4px;
+  background: linear-gradient(180deg, $color-accent-gold, $color-primary-600);
+  border-radius: 10px;
+  border: 2px solid $color-gray-100;
 
   &:hover {
-    background-color: $color-gray-500;
+    background: linear-gradient(180deg, darken($color-accent-gold, 5%), darken($color-primary-600, 5%));
   }
+}
+
+// Selection
+::selection {
+  background-color: rgba($color-accent-gold, 0.3);
+  color: $color-gray-900;
 }
 
 // კურსორის სტილიზაცია
