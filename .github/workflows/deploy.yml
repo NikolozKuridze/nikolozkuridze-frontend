@@ -1,0 +1,83 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SERVICE_NAME: "nikolozkuridze-frontend"
+      DEPLOY_PATH: "/www/wwwroot/nikolozkuridze.com"
+      SUPERVISOR_SERVICE: "nikolozkuridze-frontend:*"
+      NODE_VERSION: "20.x"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run linting
+        run: |
+          npm run lint
+
+      - name: Run type checking
+        run: |
+          npm run type-check
+
+      - name: Build application
+        run: |
+          npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "./dist" ]; then
+            echo "Build failed: dist directory not found"
+            exit 1
+          fi
+          echo "Build successful - dist directory exists"
+          ls -lh ./dist
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy application to server
+        run: |
+          rsync -avz --delete -e "ssh -p ${{ secrets.SSH_PORT }}" ./dist/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:$DEPLOY_PATH/
+
+      - name: Set production environment
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            cd '$DEPLOY_PATH'
+            sudo chown -R www-data:www-data .
+            sudo chmod -R 755 .
+          "
+
+      - name: Restart service
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            sudo /www/server/panel/pyenv/bin/supervisorctl restart '$SUPERVISOR_SERVICE'
+            sleep 5
+            sudo /www/server/panel/pyenv/bin/supervisorctl status '$SUPERVISOR_SERVICE'
+          "
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf ~/.ssh ./dist
