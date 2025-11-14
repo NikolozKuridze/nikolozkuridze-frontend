@@ -12,7 +12,6 @@ jobs:
     env:
       SERVICE_NAME: "nikolozkuridze-frontend"
       DEPLOY_PATH: "/www/wwwroot/nikolozkuridze.com"
-      SUPERVISOR_SERVICE: "nikolozkuridze-frontend:*"
       NODE_VERSION: "20.x"
 
     steps:
@@ -67,14 +66,6 @@ jobs:
             cd '$DEPLOY_PATH'
             sudo chown -R www-data:www-data .
             sudo chmod -R 755 .
-          "
-
-      - name: Restart service
-        run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
-            sudo /www/server/panel/pyenv/bin/supervisorctl restart '$SUPERVISOR_SERVICE'
-            sleep 5
-            sudo /www/server/panel/pyenv/bin/supervisorctl status '$SUPERVISOR_SERVICE'
           "
 
       - name: Cleanup
