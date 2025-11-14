@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminApi } from '../../store/adminStore';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, BookOpen } from 'lucide-react';
 
 interface Blog {
   _id: string;
