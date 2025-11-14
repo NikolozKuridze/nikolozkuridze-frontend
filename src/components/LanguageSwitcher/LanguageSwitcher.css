@@ -1,0 +1,38 @@
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.language-switcher:hover {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.language-switcher__text {
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .language-switcher {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .language-switcher svg {
+    width: 18px;
+    height: 18px;
+  }
+}
