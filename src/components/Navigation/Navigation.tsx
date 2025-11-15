@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
@@ -7,31 +8,33 @@ import { LanguageSwitcher } from '../LanguageSwitcher/LanguageSwitcher';
 import './Navigation.css';
 
 const navItems = [
-  { id: 'home', label: 'Home' },
-  { id: 'about', label: 'About' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'achievements', label: 'Achievements' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'home', label: 'Home', isSection: true },
+  { id: 'about', label: 'About', isSection: true },
+  { id: 'experience', label: 'Experience', isSection: true },
+  { id: 'achievements', label: 'Achievements', isSection: true },
+  { id: 'projects', label: 'Projects', isSection: true },
+  { id: 'blogs', label: 'Blog', isSection: false, path: '/blogs' },
+  { id: 'contact', label: 'Contact', isSection: true },
 ];
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
 
       // Update active section based on scroll position
-      const sections = navItems.map(item => document.getElementById(item.id));
+      const sections = navItems.filter(item => item.isSection).map(item => document.getElementById(item.id));
       const scrollPosition = window.scrollY + 100;
 
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = sections[i];
         if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(navItems[i].id);
+          setActiveSection(navItems.filter(item => item.isSection)[i].id);
           break;
         }
       }
@@ -45,6 +48,19 @@ export const Navigation = () => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      setIsOpen(false);
+    }
+  };
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.isSection) {
+      if (location.pathname !== '/') {
+        // If not on home page, navigate to home first
+        window.location.href = `/#${item.id}`;
+      } else {
+        scrollToSection(item.id);
+      }
+    } else {
       setIsOpen(false);
     }
   };
@@ -79,12 +95,22 @@ export const Navigation = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 * index }}
               >
-                <button
-                  onClick={() => scrollToSection(item.id)}
-                  className={`nav__link ${activeSection === item.id ? 'nav__link--active' : ''}`}
-                >
-                  {item.label}
-                </button>
+                {item.isSection ? (
+                  <button
+                    onClick={() => handleNavClick(item)}
+                    className={`nav__link ${activeSection === item.id ? 'nav__link--active' : ''}`}
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  <Link
+                    to={item.path || '#'}
+                    onClick={() => handleNavClick(item)}
+                    className={`nav__link ${location.pathname === item.path ? 'nav__link--active' : ''}`}
+                  >
+                    {item.label}
+                  </Link>
+                )}
               </motion.li>
             ))}
           </motion.ul>
@@ -133,12 +159,22 @@ export const Navigation = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
-                    <button
-                      onClick={() => scrollToSection(item.id)}
-                      className={`nav__mobile-link ${activeSection === item.id ? 'nav__mobile-link--active' : ''}`}
-                    >
-                      {item.label}
-                    </button>
+                    {item.isSection ? (
+                      <button
+                        onClick={() => handleNavClick(item)}
+                        className={`nav__mobile-link ${activeSection === item.id ? 'nav__mobile-link--active' : ''}`}
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <Link
+                        to={item.path || '#'}
+                        onClick={() => handleNavClick(item)}
+                        className={`nav__mobile-link ${location.pathname === item.path ? 'nav__mobile-link--active' : ''}`}
+                      >
+                        {item.label}
+                      </Link>
+                    )}
                   </motion.li>
                 ))}
               </ul>

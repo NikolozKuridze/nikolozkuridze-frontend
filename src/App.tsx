@@ -6,6 +6,7 @@ import { Hero } from './sections/Hero/Hero';
 import { About } from './sections/About/About';
 import { Experience } from './sections/Experience/Experience';
 import { Projects } from './sections/Projects/Projects';
+import { Blogs } from './sections/Blogs/Blogs';
 import { Contact } from './sections/Contact/Contact';
 import { Footer } from './components/Footer/Footer';
 import AdminLogin from './pages/admin/Login';
@@ -16,7 +17,8 @@ import AdminProjects from './pages/admin/Projects';
 import ProjectEditor from './pages/admin/ProjectEditor';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
-import './styles/globals.css';
+import BlogsPage from './pages/BlogsPage';
+import BlogDetailPage from './pages/BlogDetailPage';
 
 function HomePage() {
   return (
@@ -27,6 +29,7 @@ function HomePage() {
         <About />
         <Experience />
         <Projects />
+        <Blogs />
         <Contact />
       </main>
       <Footer />
@@ -41,6 +44,8 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="/blogs/:slug" element={<BlogDetailPage />} />
 
           {/* Admin Login Route - No Layout */}
           <Route path="/admin/login" element={<AdminLogin />} />
