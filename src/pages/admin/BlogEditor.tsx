@@ -185,32 +185,34 @@ export default function BlogEditor() {
   };
 
   const generateSlug = () => {
-    const slug = form.title.en
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    setForm({ ...form, slug });
+    setForm(prevForm => {
+      const slug = prevForm.title.en
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      return { ...prevForm, slug };
+    });
   };
 
-  // FIXED: Update content handlers with logging
+  // FIXED: Update content handlers with functional state updates to avoid stale closures
   const handleEnglishContentChange = (value: string) => {
     console.log('English content changed:', { length: value.length, value: value.substring(0, 100) });
-    setForm({
-      ...form,
-      content: { ...form.content, en: value }
-    });
+    setForm(prevForm => ({
+      ...prevForm,
+      content: { ...prevForm.content, en: value }
+    }));
     // Clear error when content is added
     if (!isContentEmpty(value) && errors.contentEn) {
-      setErrors({ ...errors, contentEn: '' });
+      setErrors(prevErrors => ({ ...prevErrors, contentEn: '' }));
     }
   };
 
   const handleGeorgianContentChange = (value: string) => {
     console.log('Georgian content changed:', { length: value.length, value: value.substring(0, 100) });
-    setForm({
-      ...form,
-      content: { ...form.content, ka: value }
-    });
+    setForm(prevForm => ({
+      ...prevForm,
+      content: { ...prevForm.content, ka: value }
+    }));
   };
 
   return (
@@ -286,10 +288,10 @@ export default function BlogEditor() {
                 type="text"
                 value={form.title[activeTab]}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    title: { ...form.title, [activeTab]: e.target.value }
-                  })
+                  setForm(prevForm => ({
+                    ...prevForm,
+                    title: { ...prevForm.title, [activeTab]: e.target.value }
+                  }))
                 }
                 onBlur={() => activeTab === 'en' && !form.slug && generateSlug()}
                 required
@@ -308,10 +310,10 @@ export default function BlogEditor() {
               <textarea
                 value={form.description[activeTab]}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: { ...form.description, [activeTab]: e.target.value }
-                  })
+                  setForm(prevForm => ({
+                    ...prevForm,
+                    description: { ...prevForm.description, [activeTab]: e.target.value }
+                  }))
                 }
                 required
                 rows={3}
@@ -322,7 +324,7 @@ export default function BlogEditor() {
               />
             </div>
 
-            {/* Content - FIXED: Separate editors with proper state management */}
+            {/* Content - FIXED: Only render active editor to prevent state issues */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 {t('admin.blog.content')} ({activeTab.toUpperCase()}) *
@@ -333,29 +335,28 @@ export default function BlogEditor() {
                   Content is required - please add some text
                 </p>
               )}
-              
+
               {/* Debug info in development */}
               {process.env.NODE_ENV === 'development' && (
                 <div className="mb-2 p-2 bg-slate-800 rounded text-xs text-slate-400">
                   Content length: {form.content[activeTab].length} chars
                 </div>
               )}
-              
-              {/* English Editor */}
-              <div style={{ display: activeTab === 'en' ? 'block' : 'none' }}>
+
+              {/* Conditionally render only the active editor */}
+              {activeTab === 'en' ? (
                 <RichTextEditor
+                  key="editor-en"
                   value={form.content.en}
                   onChange={handleEnglishContentChange}
                 />
-              </div>
-              
-              {/* Georgian Editor */}
-              <div style={{ display: activeTab === 'ka' ? 'block' : 'none' }}>
+              ) : (
                 <RichTextEditor
+                  key="editor-ka"
                   value={form.content.ka}
                   onChange={handleGeorgianContentChange}
                 />
-              </div>
+              )}
             </div>
           </div>
 
@@ -395,7 +396,7 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                onChange={(e) => setForm(prevForm => ({ ...prevForm, slug: e.target.value }))}
                 required
                 className={`w-full px-4 py-2 bg-slate-900/50 border ${
                   errors.slug ? 'border-red-500' : 'border-slate-600'
@@ -418,7 +419,7 @@ export default function BlogEditor() {
               </label>
               <select
                 value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                onChange={(e) => setForm(prevForm => ({ ...prevForm, category: e.target.value }))}
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="tutorial">Tutorial</option>
@@ -436,7 +437,7 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                onChange={(e) => setForm(prevForm => ({ ...prevForm, tags: e.target.value }))}
                 placeholder="react, javascript, tutorial"
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
@@ -451,7 +452,7 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.thumbnail}
-                onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+                onChange={(e) => setForm(prevForm => ({ ...prevForm, thumbnail: e.target.value }))}
                 placeholder="https://..."
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
@@ -468,10 +469,10 @@ export default function BlogEditor() {
                   <input
                     type="text"
                     value={form.author.name}
-                    onChange={(e) => setForm({
-                      ...form,
-                      author: { ...form.author, name: e.target.value }
-                    })}
+                    onChange={(e) => setForm(prevForm => ({
+                      ...prevForm,
+                      author: { ...prevForm.author, name: e.target.value }
+                    }))}
                     required
                     placeholder="John Doe"
                     className={`w-full px-4 py-2 bg-slate-900/50 border ${
@@ -485,10 +486,10 @@ export default function BlogEditor() {
                   </label>
                   <textarea
                     value={form.author.bio || ''}
-                    onChange={(e) => setForm({
-                      ...form,
-                      author: { ...form.author, bio: e.target.value }
-                    })}
+                    onChange={(e) => setForm(prevForm => ({
+                      ...prevForm,
+                      author: { ...prevForm.author, bio: e.target.value }
+                    }))}
                     rows={2}
                     placeholder="Short bio..."
                     className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -501,10 +502,10 @@ export default function BlogEditor() {
                   <input
                     type="text"
                     value={form.author.avatar || ''}
-                    onChange={(e) => setForm({
-                      ...form,
-                      author: { ...form.author, avatar: e.target.value }
-                    })}
+                    onChange={(e) => setForm(prevForm => ({
+                      ...prevForm,
+                      author: { ...prevForm.author, avatar: e.target.value }
+                    }))}
                     placeholder="https://..."
                     className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
@@ -520,7 +521,7 @@ export default function BlogEditor() {
                 <input
                   type="checkbox"
                   checked={form.published}
-                  onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                  onChange={(e) => setForm(prevForm => ({ ...prevForm, published: e.target.checked }))}
                   className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 />
                 <span className="text-slate-300 group-hover:text-white transition-colors">{t('admin.blog.published')}</span>
@@ -530,7 +531,7 @@ export default function BlogEditor() {
                 <input
                   type="checkbox"
                   checked={form.featured}
-                  onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                  onChange={(e) => setForm(prevForm => ({ ...prevForm, featured: e.target.checked }))}
                   className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 />
                 <span className="text-slate-300 group-hover:text-white transition-colors">{t('admin.blog.featured')}</span>
