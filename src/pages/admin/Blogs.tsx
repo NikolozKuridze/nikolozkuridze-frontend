@@ -1,20 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
+import toast from 'react-hot-toast';
+import { blogService } from '../../services/api.service';
 import { Plus, Edit, Trash2, Eye, BookOpen, Search, Filter, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Blog {
-  _id: string;
-  title: { en: string; ka: string };
-  slug: string;
-  category: string;
-  published: boolean;
-  featured: boolean;
-  views: number;
-  createdAt: string;
-}
+import type { Blog } from '../../types/api';
 
 export default function AdminBlogs() {
   const { t, i18n } = useTranslation();
@@ -26,74 +17,37 @@ export default function AdminBlogs() {
   }, []);
 
   const fetchBlogs = async () => {
-    // MOCK DATA FOR TESTING - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const mockBlogs: Blog[] = [
-      {
-        _id: '1',
-        title: { en: 'Getting Started with React', ka: 'React-ის დაწყება' },
-        slug: 'getting-started-with-react',
-        category: 'tutorial',
-        published: true,
-        featured: true,
-        views: 523,
-        createdAt: '2024-01-15T10:00:00Z'
-      },
-      {
-        _id: '2',
-        title: { en: 'Advanced TypeScript Patterns', ka: 'TypeScript-ის მოწინავე შაბლონები' },
-        slug: 'advanced-typescript-patterns',
-        category: 'article',
-        published: true,
-        featured: false,
-        views: 342,
-        createdAt: '2024-01-20T14:30:00Z'
-      },
-      {
-        _id: '3',
-        title: { en: 'Building REST APIs', ka: 'REST API-ების შექმნა' },
-        slug: 'building-rest-apis',
-        category: 'tutorial',
-        published: false,
-        featured: false,
-        views: 0,
-        createdAt: '2024-01-25T09:15:00Z'
-      }
-    ];
-
-    setBlogs(mockBlogs);
-    setLoading(false);
-
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
-      const response = await adminApi.get('/blogs/all');
-      setBlogs(response.data.blogs || []);
+      const data = await blogService.getAll();
+      setBlogs(data);
     } catch (error) {
       console.error('Error fetching blogs:', error);
+      toast.error(t('admin.common.error') || 'Failed to load blogs');
     } finally {
       setLoading(false);
     }
-    */
   };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(t('admin.blog.confirmDelete'))) return;
 
-    // MOCK DELETE - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setBlogs(blogs.filter((b) => b._id !== id));
-    alert('Blog deleted successfully!');
+    const deletePromise = blogService.delete(id);
 
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
+    toast.promise(
+      deletePromise,
+      {
+        loading: 'Deleting blog...',
+        success: 'Blog deleted successfully!',
+        error: 'Failed to delete blog',
+      }
+    );
+
     try {
-      await adminApi.delete(`/blogs/${id}`);
+      await deletePromise;
       setBlogs(blogs.filter((b) => b._id !== id));
     } catch (error) {
       console.error('Error deleting blog:', error);
-      alert(t('admin.common.error'));
     }
-    */
   };
 
   const [searchQuery, setSearchQuery] = useState('');

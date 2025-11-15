@@ -1,59 +1,42 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
+import toast from 'react-hot-toast';
+import { dashboardService } from '../../services/api.service';
 import { BookOpen, FolderGit2, Eye, TrendingUp, ArrowUpRight, Plus, Clock, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { DashboardStats, RecentActivity } from '../../types/api';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<DashboardStats>({
     totalBlogs: 0,
     publishedBlogs: 0,
     totalProjects: 0,
     totalViews: 0
   });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
+    fetchDashboardData();
   }, []);
 
-  const fetchStats = async () => {
-    // MOCK DATA FOR TESTING - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
-
-    setStats({
-      totalBlogs: 12,
-      publishedBlogs: 8,
-      totalProjects: 15,
-      totalViews: 1234
-    });
-    setLoading(false);
-
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
+  const fetchDashboardData = async () => {
     try {
-      const [blogsRes, projectsRes] = await Promise.all([
-        adminApi.get('/blogs/all'),
-        adminApi.get('/projects/all')
+      const [statsData, activityData] = await Promise.all([
+        dashboardService.getStats(),
+        dashboardService.getRecentActivity()
       ]);
 
-      const blogs = blogsRes.data.blogs || [];
-      const projects = projectsRes.data.projects || [];
-      const totalViews = blogs.reduce((sum: number, blog: Blog) => sum + (blog.views || 0), 0);
-
-      setStats({
-        totalBlogs: blogs.length,
-        publishedBlogs: blogs.filter((b: Blog) => b.published).length,
-        totalProjects: projects.length,
-        totalViews
-      });
+      setStats(statsData);
+      setRecentActivity(activityData);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
-    */
   };
 
   const statCards = [
@@ -250,11 +233,13 @@ export default function AdminDashboard() {
 
         <div className="bg-slate-800/30 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden">
           <div className="divide-y divide-slate-700/50">
-            {[
-              { type: 'blog', title: 'Getting Started with React', time: '2 hours ago', status: 'published' },
-              { type: 'project', title: 'E-Commerce Platform', time: '5 hours ago', status: 'updated' },
-              { type: 'blog', title: 'Advanced TypeScript Patterns', time: '1 day ago', status: 'draft' }
-            ].map((item, index) => (
+            {recentActivity.length === 0 ? (
+              <div className="p-12 text-center text-slate-400">
+                <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No recent activity yet</p>
+              </div>
+            ) : (
+              recentActivity.map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, x: -20 }}
@@ -291,7 +276,8 @@ export default function AdminDashboard() {
                   <Star className="w-5 h-5 text-slate-600 group-hover:text-amber-400 transition-colors" />
                 </div>
               </motion.div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </motion.div>
