@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { blogService } from '../../services/api.service';
 import RichTextEditor from '../../components/admin/RichTextEditor';
@@ -20,6 +21,7 @@ interface BlogForm {
 }
 
 export default function BlogEditor() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
@@ -153,7 +155,7 @@ export default function BlogEditor() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent mb-2">
-            {isEdit ? 'Edit Blog Post' : 'Create New Blog Post'}
+            {isEdit ? t('admin.blog.edit') : t('admin.blog.create')}
           </h1>
           <p className="text-slate-400">
             {isEdit ? 'Update your blog content' : 'Share your thoughts and insights'}
@@ -188,7 +190,7 @@ export default function BlogEditor() {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            English
+            {t('admin.common.english')}
             {activeTab === 'en' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
             )}
@@ -202,7 +204,7 @@ export default function BlogEditor() {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Georgian
+            {t('admin.common.georgian')}
             {activeTab === 'ka' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
             )}
@@ -215,7 +217,7 @@ export default function BlogEditor() {
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Title ({activeTab.toUpperCase()}) *
+                {t('admin.blog.title')} ({activeTab.toUpperCase()}) *
               </label>
               <input
                 type="text"
@@ -238,7 +240,7 @@ export default function BlogEditor() {
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Description ({activeTab.toUpperCase()}) *
+                {t('admin.blog.description')} ({activeTab.toUpperCase()}) *
               </label>
               <textarea
                 value={form.description[activeTab]}
@@ -260,7 +262,7 @@ export default function BlogEditor() {
             {/* Content */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Content ({activeTab.toUpperCase()}) *
+                {t('admin.blog.content')} ({activeTab.toUpperCase()}) *
               </label>
               {errors.contentEn && activeTab === 'en' && (
                 <p className="text-red-400 text-sm mb-2">Content is required</p>
@@ -283,7 +285,7 @@ export default function BlogEditor() {
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <h3 className="text-white font-semibold mb-4 flex items-center space-x-2">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
-                <span>Actions</span>
+                <span>{t('admin.editor.actions')}</span>
               </h3>
               <div className="space-y-3">
                 <button
@@ -292,7 +294,7 @@ export default function BlogEditor() {
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
                 >
                   <Save className="w-5 h-5" />
-                  <span>{loading ? 'Saving...' : 'Save Blog'}</span>
+                  <span>{loading ? t('admin.common.loading') : t('admin.blog.save')}</span>
                 </button>
                 <button
                   type="button"
@@ -300,7 +302,7 @@ export default function BlogEditor() {
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-300"
                 >
                   <X className="w-5 h-5" />
-                  <span>Cancel</span>
+                  <span>{t('admin.blog.cancel')}</span>
                 </button>
               </div>
             </div>
@@ -308,7 +310,7 @@ export default function BlogEditor() {
             {/* Slug */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                URL Slug *
+                {t('admin.blog.slug')} *
               </label>
               <input
                 type="text"
@@ -332,7 +334,7 @@ export default function BlogEditor() {
             {/* Category */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Category
+                {t('admin.blog.category')}
               </label>
               <select
                 value={form.category}
@@ -349,7 +351,7 @@ export default function BlogEditor() {
             {/* Tags */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Tags
+                {t('admin.blog.tags')}
               </label>
               <input
                 type="text"
@@ -364,7 +366,7 @@ export default function BlogEditor() {
             {/* Thumbnail */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Thumbnail URL
+                {t('admin.blog.thumbnail')}
               </label>
               <input
                 type="text"
@@ -377,7 +379,7 @@ export default function BlogEditor() {
 
             {/* Author */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <h3 className="text-white font-semibold mb-4">Author *</h3>
+              <h3 className="text-white font-semibold mb-4">{t('admin.blog.author')} *</h3>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -432,7 +434,7 @@ export default function BlogEditor() {
 
             {/* Settings */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 space-y-4">
-              <h3 className="text-white font-semibold">Settings</h3>
+              <h3 className="text-white font-semibold">{t('admin.editor.settings')}</h3>
 
               <label className="flex items-center space-x-3 cursor-pointer group">
                 <input
@@ -441,7 +443,7 @@ export default function BlogEditor() {
                   onChange={(e) => setForm({ ...form, published: e.target.checked })}
                   className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 />
-                <span className="text-slate-300 group-hover:text-white transition-colors">Published</span>
+                <span className="text-slate-300 group-hover:text-white transition-colors">{t('admin.blog.published')}</span>
               </label>
 
               <label className="flex items-center space-x-3 cursor-pointer group">
@@ -451,7 +453,7 @@ export default function BlogEditor() {
                   onChange={(e) => setForm({ ...form, featured: e.target.checked })}
                   className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 />
-                <span className="text-slate-300 group-hover:text-white transition-colors">Featured</span>
+                <span className="text-slate-300 group-hover:text-white transition-colors">{t('admin.blog.featured')}</span>
               </label>
             </div>
           </div>

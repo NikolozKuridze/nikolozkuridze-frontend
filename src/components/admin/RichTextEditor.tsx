@@ -27,9 +27,16 @@ hljs.registerLanguage('markdown', markdown);
 hljs.registerLanguage('xml', xml);
 hljs.registerLanguage('html', xml);
 
+// Extend Window interface for hljs
+declare global {
+  interface Window {
+    hljs: typeof hljs;
+  }
+}
+
 // Make hljs available globally for Quill
 if (typeof window !== 'undefined') {
-  (window as any).hljs = hljs;
+  window.hljs = hljs;
 }
 
 interface RichTextEditorProps {

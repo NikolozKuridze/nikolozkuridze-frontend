@@ -97,10 +97,10 @@ export default function AdminBlogs() {
       >
         <div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent mb-2">
-            {t('admin.blogs')}
+            {t('admin.blogsList.title')}
           </h1>
           <p className="text-slate-400 text-lg">
-            Manage and organize your blog content
+            {t('admin.blogsList.subtitle')}
           </p>
         </div>
         <Link to="/admin/blogs/new">
@@ -126,7 +126,7 @@ export default function AdminBlogs() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="text"
-            placeholder="Search blogs by title or slug..."
+            placeholder={t('admin.blogsList.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition-all"
@@ -138,7 +138,7 @@ export default function AdminBlogs() {
           className="flex items-center space-x-2 px-6 py-3.5 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-slate-300 hover:text-white hover:border-slate-600/50 transition-all"
         >
           <Filter className="w-5 h-5" />
-          <span className="font-medium">Filters</span>
+          <span className="font-medium">{t('admin.blogsList.filters')}</span>
         </motion.button>
       </motion.div>
 
@@ -160,12 +160,12 @@ export default function AdminBlogs() {
                   {t('admin.blog.category')}
                 </th>
                 <th className="text-center px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
-                  Status
+                  {t('admin.blogsList.status')}
                 </th>
                 <th className="text-center px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
                   <div className="flex items-center justify-center space-x-1">
                     <Eye className="w-4 h-4" />
-                    <span>Views</span>
+                    <span>{t('admin.blogsList.views')}</span>
                   </div>
                 </th>
                 <th className="text-right px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
@@ -202,12 +202,12 @@ export default function AdminBlogs() {
                         {blog.published ? (
                           <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 animate-pulse" />
-                            Published
+                            {t('admin.blogsList.published')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-500/10 text-slate-300 border border-slate-500/20">
                             <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2" />
-                            Draft
+                            {t('admin.blogsList.draft')}
                           </span>
                         )}
                         {blog.featured && (
@@ -261,10 +261,10 @@ export default function AdminBlogs() {
               <BookOpen className="w-12 h-12 text-slate-600" />
             </div>
             <p className="text-slate-400 text-lg mb-2">
-              {searchQuery ? 'No blogs found matching your search' : 'No blogs yet'}
+              {searchQuery ? t('admin.blogsList.noResults') : t('admin.blogsList.noBlogs')}
             </p>
             <p className="text-slate-500 text-sm">
-              {searchQuery ? 'Try a different search term' : 'Create your first blog post to get started'}
+              {searchQuery ? t('admin.blogsList.tryDifferent') : t('admin.blogsList.noBlogsDesc')}
             </p>
             {!searchQuery && (
               <Link to="/admin/blogs/new">
@@ -273,7 +273,7 @@ export default function AdminBlogs() {
                   whileTap={{ scale: 0.95 }}
                   className="mt-6 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-sky-500/20"
                 >
-                  Create Your First Blog
+                  {t('admin.blogsList.createFirst')}
                 </motion.button>
               </Link>
             )}
@@ -290,11 +290,11 @@ export default function AdminBlogs() {
           className="mt-6 flex items-center justify-between text-sm text-slate-400"
         >
           <div className="flex items-center space-x-4">
-            <span>Showing {filteredBlogs.length} of {blogs.length} blogs</span>
+            <span>{t('admin.blogsList.showing')} {filteredBlogs.length} {t('admin.blogsList.of')} {blogs.length} {t('admin.blogsList.blogsCount')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Calendar className="w-4 h-4" />
-            <span>Last updated: Today</span>
+            <span>{t('admin.blogsList.lastUpdated')}</span>
           </div>
         </motion.div>
       )}
