@@ -1,19 +1,27 @@
 import { useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
-import 'prismjs/themes/prism-tomorrow.css';
-import Prism from 'prismjs';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark.css';
 
-// Import languages for syntax highlighting
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-jsx';
-import 'prismjs/components/prism-tsx';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-markdown';
+// Register languages for syntax highlighting
+import javascript from 'highlight.js/lib/languages/javascript';
+import typescript from 'highlight.js/lib/languages/typescript';
+import css from 'highlight.js/lib/languages/css';
+import python from 'highlight.js/lib/languages/python';
+import bash from 'highlight.js/lib/languages/bash';
+import json from 'highlight.js/lib/languages/json';
+import markdown from 'highlight.js/lib/languages/markdown';
+import xml from 'highlight.js/lib/languages/xml'; // For JSX/TSX
+
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('typescript', typescript);
+hljs.registerLanguage('css', css);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('bash', bash);
+hljs.registerLanguage('json', json);
+hljs.registerLanguage('markdown', markdown);
+hljs.registerLanguage('xml', xml);
 
 interface RichTextEditorProps {
   value: string;
@@ -47,7 +55,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
           ['clean']
         ],
         syntax: {
-          highlight: (text: string) => Prism.highlight(text, Prism.languages.javascript, 'javascript')
+          highlight: (text: string) => hljs.highlightAuto(text).value
         }
       }
     });
@@ -82,15 +90,6 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     }
   }, [value]);
 
-  useEffect(() => {
-    // Highlight code blocks
-    if (quillInstanceRef.current) {
-      const codeBlocks = quillInstanceRef.current.container.querySelectorAll('pre');
-      codeBlocks.forEach((block) => {
-        Prism.highlightElement(block);
-      });
-    }
-  }, [value]);
 
   return (
     <div className="rich-text-editor">
