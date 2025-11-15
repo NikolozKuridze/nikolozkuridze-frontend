@@ -78,6 +78,7 @@ export default function ProjectEditor() {
       alert(t('admin.common.error'));
     }
     */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, t]);
 
   useEffect(() => {

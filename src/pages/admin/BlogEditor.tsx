@@ -76,6 +76,7 @@ export default function BlogEditor() {
       alert(t('admin.common.error'));
     }
     */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, t]);
 
   useEffect(() => {
