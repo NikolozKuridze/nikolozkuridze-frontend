@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# TypeScript build artifacts
+*.tsbuildinfo
+*.d.ts
+
 # Environment files (keep .env.example)
 # .env
 # server/.env
