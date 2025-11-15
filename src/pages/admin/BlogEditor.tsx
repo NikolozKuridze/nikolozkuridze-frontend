@@ -74,7 +74,6 @@ export default function BlogEditor() {
   }, [isEdit, fetchBlog]);
 
   const isContentEmpty = (content: string): boolean => {
-    // Remove all HTML tags and check if there's any actual text content
     const textContent = content.replace(/<[^>]*>/g, '').trim();
     return textContent.length === 0;
   };
@@ -265,7 +264,7 @@ export default function BlogEditor() {
               />
             </div>
 
-            {/* Content */}
+            {/* Content - FIXED: Render separate editors for each language */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 {t('admin.blog.content')} ({activeTab.toUpperCase()}) *
@@ -273,16 +272,30 @@ export default function BlogEditor() {
               {errors.contentEn && activeTab === 'en' && (
                 <p className="text-red-400 text-sm mb-2">Content is required</p>
               )}
-              <RichTextEditor
-                key={activeTab}
-                value={form.content[activeTab]}
-                onChange={(value) =>
-                  setForm({
-                    ...form,
-                    content: { ...form.content, [activeTab]: value }
-                  })
-                }
-              />
+              {/* English Editor - Only shown when English tab is active */}
+              {activeTab === 'en' && (
+                <RichTextEditor
+                  value={form.content.en}
+                  onChange={(value) =>
+                    setForm({
+                      ...form,
+                      content: { ...form.content, en: value }
+                    })
+                  }
+                />
+              )}
+              {/* Georgian Editor - Only shown when Georgian tab is active */}
+              {activeTab === 'ka' && (
+                <RichTextEditor
+                  value={form.content.ka}
+                  onChange={(value) =>
+                    setForm({
+                      ...form,
+                      content: { ...form.content, ka: value }
+                    })
+                  }
+                />
+              )}
             </div>
           </div>
 
