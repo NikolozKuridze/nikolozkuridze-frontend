@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.nikolozkuridze.com';
 
 interface Admin {
   id: string;
@@ -26,7 +26,26 @@ export const useAdminStore = create<AdminState>()(
       token: null,
       isAuthenticated: false,
 
-      login: async (email: string, password: string) => {
+      login: async (email: string, _password: string) => {
+        // MOCK LOGIN FOR TESTING - Remove when .NET API is ready
+        // This allows login with any credentials to test the UI
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+
+        const mockAdmin = {
+          id: '1',
+          email: email,
+          name: 'Admin User'
+        };
+
+        const mockToken = btoa(JSON.stringify({ email, timestamp: Date.now() }));
+
+        set({
+          admin: mockAdmin,
+          token: mockToken,
+          isAuthenticated: true
+        });
+
+        /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
         try {
           const response = await axios.post(`${API_URL}/auth/login`, {
             email,
@@ -43,6 +62,7 @@ export const useAdminStore = create<AdminState>()(
         } catch {
           throw new Error('Invalid credentials');
         }
+        */
       },
 
       logout: () => {
@@ -57,6 +77,23 @@ export const useAdminStore = create<AdminState>()(
         const { token } = get();
         if (!token) return false;
 
+        // MOCK TOKEN VERIFICATION - Remove when .NET API is ready
+        try {
+          const decoded = JSON.parse(atob(token));
+          if (decoded.email) {
+            return true;
+          }
+          return false;
+        } catch {
+          set({
+            admin: null,
+            token: null,
+            isAuthenticated: false
+          });
+          return false;
+        }
+
+        /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
         try {
           const response = await axios.post(
             `${API_URL}/auth/verify`,
@@ -84,6 +121,7 @@ export const useAdminStore = create<AdminState>()(
           });
           return false;
         }
+        */
       }
     }),
     {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { adminApi } from '../../store/adminStore';
+// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Plus, Edit, Trash2, ExternalLink } from 'lucide-react';
 
@@ -26,6 +26,43 @@ export default function AdminProjects() {
   }, []);
 
   const fetchProjects = async () => {
+    // MOCK DATA FOR TESTING - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const mockProjects: Project[] = [
+      {
+        _id: '1',
+        title: { en: 'E-Commerce Platform', ka: 'ელექტრონული კომერციის პლატფორმა' },
+        category: 'Enterprise',
+        published: true,
+        featured: true,
+        technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
+        demoUrl: 'https://demo.example.com',
+        githubUrl: 'https://github.com/example/project'
+      },
+      {
+        _id: '2',
+        title: { en: 'AI Chat Application', ka: 'AI ჩატის აპლიკაცია' },
+        category: 'AI/ML',
+        published: true,
+        featured: false,
+        technologies: ['Next.js', 'OpenAI', 'PostgreSQL'],
+        demoUrl: 'https://chat.example.com'
+      },
+      {
+        _id: '3',
+        title: { en: 'Portfolio Website', ka: 'პორტფოლიო ვებსაიტი' },
+        category: 'Web Development',
+        published: false,
+        featured: false,
+        technologies: ['React', 'TypeScript', 'Tailwind CSS']
+      }
+    ];
+
+    setProjects(mockProjects);
+    setLoading(false);
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const response = await adminApi.get('/projects/all');
       setProjects(response.data.projects || []);
@@ -34,11 +71,18 @@ export default function AdminProjects() {
     } finally {
       setLoading(false);
     }
+    */
   };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(t('admin.project.confirmDelete'))) return;
 
+    // MOCK DELETE - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setProjects(projects.filter((p) => p._id !== id));
+    alert('Project deleted successfully!');
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       await adminApi.delete(`/projects/${id}`);
       setProjects(projects.filter((p) => p._id !== id));
@@ -46,6 +90,7 @@ export default function AdminProjects() {
       console.error('Error deleting project:', error);
       alert(t('admin.common.error'));
     }
+    */
   };
 
   if (loading) {

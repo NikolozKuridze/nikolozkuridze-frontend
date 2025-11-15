@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { adminApi } from '../../store/adminStore';
+// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Plus, Edit, Trash2, Eye, BookOpen } from 'lucide-react';
 
@@ -26,6 +26,46 @@ export default function AdminBlogs() {
   }, []);
 
   const fetchBlogs = async () => {
+    // MOCK DATA FOR TESTING - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const mockBlogs: Blog[] = [
+      {
+        _id: '1',
+        title: { en: 'Getting Started with React', ka: 'React-ის დაწყება' },
+        slug: 'getting-started-with-react',
+        category: 'tutorial',
+        published: true,
+        featured: true,
+        views: 523,
+        createdAt: '2024-01-15T10:00:00Z'
+      },
+      {
+        _id: '2',
+        title: { en: 'Advanced TypeScript Patterns', ka: 'TypeScript-ის მოწინავე შაბლონები' },
+        slug: 'advanced-typescript-patterns',
+        category: 'article',
+        published: true,
+        featured: false,
+        views: 342,
+        createdAt: '2024-01-20T14:30:00Z'
+      },
+      {
+        _id: '3',
+        title: { en: 'Building REST APIs', ka: 'REST API-ების შექმნა' },
+        slug: 'building-rest-apis',
+        category: 'tutorial',
+        published: false,
+        featured: false,
+        views: 0,
+        createdAt: '2024-01-25T09:15:00Z'
+      }
+    ];
+
+    setBlogs(mockBlogs);
+    setLoading(false);
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const response = await adminApi.get('/blogs/all');
       setBlogs(response.data.blogs || []);
@@ -34,11 +74,18 @@ export default function AdminBlogs() {
     } finally {
       setLoading(false);
     }
+    */
   };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(t('admin.blog.confirmDelete'))) return;
 
+    // MOCK DELETE - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 300));
+    setBlogs(blogs.filter((b) => b._id !== id));
+    alert('Blog deleted successfully!');
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       await adminApi.delete(`/blogs/${id}`);
       setBlogs(blogs.filter((b) => b._id !== id));
@@ -46,6 +93,7 @@ export default function AdminBlogs() {
       console.error('Error deleting blog:', error);
       alert(t('admin.common.error'));
     }
+    */
   };
 
   if (loading) {

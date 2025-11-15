@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { adminApi } from '../../store/adminStore';
+// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import AdminLayout from '../../components/admin/AdminLayout';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { Save, X } from 'lucide-react';
@@ -42,6 +42,28 @@ export default function BlogEditor() {
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
   const fetchBlog = useCallback(async () => {
+    // MOCK DATA FOR TESTING - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const mockBlog = {
+      title: { en: 'Sample Blog Post', ka: 'ნიმუში ბლოგ პოსტი' },
+      slug: 'sample-blog-post',
+      description: { en: 'This is a sample blog description', ka: 'ეს არის ნიმუში აღწერა' },
+      content: { en: '<p>Sample blog content here...</p>', ka: '<p>ნიმუში შინაარსი აქ...</p>' },
+      category: 'article',
+      tags: ['react', 'javascript', 'tutorial'],
+      thumbnail: 'https://via.placeholder.com/800x400',
+      published: true,
+      featured: false,
+      author: 'Nikoloz Kuridze'
+    };
+
+    setForm({
+      ...mockBlog,
+      tags: mockBlog.tags.join(', ')
+    });
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const response = await adminApi.get(`/blogs/${id}`);
       const blog = response.data.blog;
@@ -53,6 +75,7 @@ export default function BlogEditor() {
       console.error('Error fetching blog:', error);
       alert(t('admin.common.error'));
     }
+    */
   }, [id, t]);
 
   useEffect(() => {
@@ -65,6 +88,20 @@ export default function BlogEditor() {
     e.preventDefault();
     setLoading(true);
 
+    // MOCK SAVE - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    const data = {
+      ...form,
+      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean)
+    };
+
+    console.log('Blog data to save:', data);
+    alert(isEdit ? 'Blog updated successfully!' : 'Blog created successfully!');
+    navigate('/admin/blogs');
+    setLoading(false);
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const data = {
         ...form,
@@ -86,6 +123,7 @@ export default function BlogEditor() {
     } finally {
       setLoading(false);
     }
+    */
   };
 
   const generateSlug = () => {
