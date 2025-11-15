@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { blogService } from '../../services/api.service';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { Save, X } from 'lucide-react';
+import type { Author } from '../../types/api';
 
 interface BlogForm {
   title: { en: string; ka: string };
@@ -14,6 +15,7 @@ interface BlogForm {
   category: string;
   tags: string;
   thumbnail: string;
+  author: Author;
   published: boolean;
   featured: boolean;
 }
@@ -32,6 +34,7 @@ export default function BlogEditor() {
     category: 'article',
     tags: '',
     thumbnail: '',
+    author: { name: '', bio: '', avatar: '' },
     published: false,
     featured: false
   });
@@ -52,6 +55,7 @@ export default function BlogEditor() {
         category: blog.category,
         tags: blog.tags?.join(', ') || '',
         thumbnail: blog.thumbnail || '',
+        author: blog.author || { name: '', bio: '', avatar: '' },
         published: blog.published,
         featured: blog.featured
       });
@@ -80,6 +84,7 @@ export default function BlogEditor() {
       category: form.category,
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       thumbnail: form.thumbnail || undefined,
+      author: form.author,
       published: form.published,
       featured: form.featured
     };
@@ -292,6 +297,59 @@ export default function BlogEditor() {
                 placeholder="https://..."
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
+            </div>
+
+            {/* Author */}
+            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+              <h3 className="text-white font-semibold mb-4">Author</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={form.author.name}
+                    onChange={(e) => setForm({
+                      ...form,
+                      author: { ...form.author, name: e.target.value }
+                    })}
+                    required
+                    placeholder="John Doe"
+                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Bio
+                  </label>
+                  <textarea
+                    value={form.author.bio || ''}
+                    onChange={(e) => setForm({
+                      ...form,
+                      author: { ...form.author, bio: e.target.value }
+                    })}
+                    rows={2}
+                    placeholder="Short bio..."
+                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Avatar URL
+                  </label>
+                  <input
+                    type="text"
+                    value={form.author.avatar || ''}
+                    onChange={(e) => setForm({
+                      ...form,
+                      author: { ...form.author, avatar: e.target.value }
+                    })}
+                    placeholder="https://..."
+                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Settings */}

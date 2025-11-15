@@ -11,7 +11,7 @@ interface ProjectForm {
   longDescription: { en: string; ka: string };
   category: string;
   technologies: string;
-  imageUrl: string;
+  image: string;
   demoUrl: string;
   githubUrl: string;
   published: boolean;
@@ -31,7 +31,7 @@ export default function ProjectEditor() {
     longDescription: { en: '', ka: '' },
     category: '',
     technologies: '',
-    imageUrl: '',
+    image: '',
     demoUrl: '',
     githubUrl: '',
     published: true,
@@ -50,10 +50,10 @@ export default function ProjectEditor() {
       setForm({
         title: project.title,
         description: project.description,
-        longDescription: project.longDescription,
+        longDescription: project.longDescription || { en: '', ka: '' },
         category: project.category,
         technologies: project.technologies?.join(', ') || '',
-        imageUrl: project.imageUrl || '',
+        image: project.image || '',
         demoUrl: project.demoUrl || '',
         githubUrl: project.githubUrl || '',
         published: project.published,
@@ -80,10 +80,12 @@ export default function ProjectEditor() {
     const projectData = {
       title: form.title,
       description: form.description,
-      longDescription: form.longDescription,
+      longDescription: form.longDescription.en || form.longDescription.ka
+        ? form.longDescription
+        : null,
       category: form.category,
       technologies: form.technologies.split(',').map((t) => t.trim()).filter(Boolean),
-      imageUrl: form.imageUrl || undefined,
+      image: form.image || undefined,
       demoUrl: form.demoUrl || undefined,
       githubUrl: form.githubUrl || undefined,
       published: form.published,
@@ -271,8 +273,8 @@ export default function ProjectEditor() {
               </label>
               <input
                 type="text"
-                value={form.imageUrl}
-                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                value={form.image}
+                onChange={(e) => setForm({ ...form, image: e.target.value })}
                 placeholder="https://..."
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
