@@ -1,13 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { adminApi } from '../../store/adminStore';
+// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import { BookOpen, FolderGit2, Eye, TrendingUp } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
-
-interface Blog {
-  views?: number;
-  published: boolean;
-}
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -23,6 +18,17 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchStats = async () => {
+    // MOCK DATA FOR TESTING - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API delay
+
+    setStats({
+      totalBlogs: 12,
+      publishedBlogs: 8,
+      totalProjects: 15,
+      totalViews: 1234
+    });
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const [blogsRes, projectsRes] = await Promise.all([
         adminApi.get('/blogs/all'),
@@ -42,6 +48,7 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
+    */
   };
 
   const statCards = [

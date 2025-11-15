@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { adminApi } from '../../store/adminStore';
+// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import AdminLayout from '../../components/admin/AdminLayout';
 import { Save, X } from 'lucide-react';
 
@@ -43,6 +43,29 @@ export default function ProjectEditor() {
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
   const fetchProject = useCallback(async () => {
+    // MOCK DATA FOR TESTING - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const mockProject = {
+      title: { en: 'Sample Project', ka: 'ნიმუში პროექტი' },
+      description: { en: 'Sample project description', ka: 'ნიმუში პროექტის აღწერა' },
+      longDescription: { en: 'Detailed description here...', ka: 'დეტალური აღწერა აქ...' },
+      category: 'Web Development',
+      technologies: ['React', 'TypeScript', 'Node.js'],
+      image: 'https://via.placeholder.com/600x400',
+      demoUrl: 'https://demo.example.com',
+      githubUrl: 'https://github.com/example/project',
+      published: true,
+      featured: false,
+      order: 0
+    };
+
+    setForm({
+      ...mockProject,
+      technologies: mockProject.technologies.join(', ')
+    });
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const response = await adminApi.get(`/projects/${id}`);
       const project = response.data.project;
@@ -54,6 +77,7 @@ export default function ProjectEditor() {
       console.error('Error fetching project:', error);
       alert(t('admin.common.error'));
     }
+    */
   }, [id, t]);
 
   useEffect(() => {
@@ -66,6 +90,20 @@ export default function ProjectEditor() {
     e.preventDefault();
     setLoading(true);
 
+    // MOCK SAVE - Remove when .NET API is ready
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    const data = {
+      ...form,
+      technologies: form.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+    };
+
+    console.log('Project data to save:', data);
+    alert(isEdit ? 'Project updated successfully!' : 'Project created successfully!');
+    navigate('/admin/projects');
+    setLoading(false);
+
+    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
       const data = {
         ...form,
@@ -87,6 +125,7 @@ export default function ProjectEditor() {
     } finally {
       setLoading(false);
     }
+    */
   };
 
   return (
