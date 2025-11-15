@@ -6,6 +6,54 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+// Backend Response Types (direct from API)
+export interface AuthLoginResponse {
+  success: boolean;
+  token: string;
+  admin: Admin;
+}
+
+export interface AuthVerifyResponse {
+  success: boolean;
+  admin: Admin;
+}
+
+export interface BlogsResponse {
+  success: boolean;
+  blogs: Blog[];
+}
+
+export interface BlogResponse {
+  success: boolean;
+  blog: Blog;
+}
+
+export interface ProjectsResponse {
+  success: boolean;
+  projects: Project[];
+}
+
+export interface ProjectResponse {
+  success: boolean;
+  project: Project;
+}
+
+export interface MessageResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface PaginatedBlogsResponse {
+  success: boolean;
+  blogs: Blog[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}
+
 // Admin Types
 export interface Admin {
   id: string;
@@ -16,6 +64,13 @@ export interface Admin {
 export interface AuthResponse {
   admin: Admin;
   token: string;
+}
+
+// Author Type
+export interface Author {
+  name: string;
+  bio?: string;
+  avatar?: string;
 }
 
 // Blog Types
@@ -37,6 +92,7 @@ export interface Blog {
   category: string;
   tags: string[];
   thumbnail?: string;
+  author: Author;
   published: boolean;
   featured: boolean;
   views: number;
@@ -61,6 +117,7 @@ export interface BlogFormData {
   category: string;
   tags: string[];
   thumbnail?: string;
+  author: Author;
   published: boolean;
   featured: boolean;
 }
@@ -76,13 +133,13 @@ export interface Project {
     en: string;
     ka: string;
   };
-  longDescription: {
+  longDescription?: {
     en: string;
     ka: string;
-  };
+  } | null;
   category: string;
   technologies: string[];
-  imageUrl?: string;
+  image?: string;
   demoUrl?: string;
   githubUrl?: string;
   published: boolean;
@@ -101,13 +158,13 @@ export interface ProjectFormData {
     en: string;
     ka: string;
   };
-  longDescription: {
+  longDescription?: {
     en: string;
     ka: string;
-  };
+  } | null;
   category: string;
   technologies: string[];
-  imageUrl?: string;
+  image?: string;
   demoUrl?: string;
   githubUrl?: string;
   published: boolean;
