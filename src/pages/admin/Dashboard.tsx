@@ -76,15 +76,15 @@ export default function AdminDashboard() {
 
   const quickActions = [
     {
-      title: 'Create New Blog',
-      description: 'Write and publish a new blog post',
+      title: t('admin.dashboard.createBlog'),
+      description: t('admin.dashboard.createBlogDesc'),
       icon: BookOpen,
       to: '/admin/blogs/new',
       gradient: 'from-sky-500 to-blue-600'
     },
     {
-      title: 'Add Project',
-      description: 'Showcase a new project',
+      title: t('admin.dashboard.addProject'),
+      description: t('admin.dashboard.addProjectDesc'),
       icon: FolderGit2,
       to: '/admin/projects/new',
       gradient: 'from-purple-500 to-violet-600'
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
           {t('admin.dashboard')}
         </h1>
         <p className="text-slate-400 text-lg">
-          Welcome back! Here's what's happening with your content.
+          {t('admin.dashboard.welcome')}
         </p>
       </motion.div>
 
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
         className="mb-8"
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-white">{t('admin.dashboard.quickActions')}</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -228,7 +228,7 @@ export default function AdminDashboard() {
         transition={{ delay: 0.6 }}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Recent Activity</h2>
+          <h2 className="text-2xl font-bold text-white">{t('admin.dashboard.recentActivity')}</h2>
         </div>
 
         <div className="bg-slate-800/30 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden">
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
             {recentActivity.length === 0 ? (
               <div className="p-12 text-center text-slate-400">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p>No recent activity yet</p>
+                <p>{t('admin.dashboard.noActivity')}</p>
               </div>
             ) : (
               recentActivity.map((item, index) => (

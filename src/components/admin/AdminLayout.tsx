@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAdminStore } from '../../store/adminStore';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   BookOpen,
@@ -15,6 +16,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const logout = useAdminStore((state) => state.logout);
@@ -26,23 +28,22 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
-  // Fixed: Using static labels instead of translation keys that return objects
   const navItems = [
     {
       path: '/admin/dashboard',
-      label: 'Dashboard',
+      label: t('admin.dashboard'),
       icon: LayoutDashboard,
       gradient: 'from-sky-500 to-blue-600'
     },
     {
       path: '/admin/blogs',
-      label: 'Blogs',
+      label: t('admin.blogs'),
       icon: BookOpen,
       gradient: 'from-emerald-500 to-green-600'
     },
     {
       path: '/admin/projects',
-      label: 'Projects',
+      label: t('admin.projects'),
       icon: FolderGit2,
       gradient: 'from-purple-500 to-violet-600'
     }
@@ -115,7 +116,7 @@ export default function AdminLayout() {
                   Nikoloz Kuridze
                 </h2>
                 <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-                  Admin Panel
+                  {t('admin.title')}
                 </p>
               </div>
             </motion.div>
@@ -173,7 +174,7 @@ export default function AdminLayout() {
         </nav>
 
         {/* Quick Actions */}
-        <div className="px-4 py-4">
+        <div className="px-4 py-4 space-y-2">
           <Link to="/">
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -181,7 +182,7 @@ export default function AdminLayout() {
               className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 text-slate-300 hover:text-white transition-all duration-300 group"
             >
               <Home className="w-5 h-5 group-hover:text-sky-400 transition-colors" />
-              <span className="font-medium">View Website</span>
+              <span className="font-medium">{t('admin.layout.viewWebsite')}</span>
             </motion.button>
           </Link>
         </div>
@@ -194,7 +195,7 @@ export default function AdminLayout() {
                 <User className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-slate-400 mb-0.5 uppercase tracking-wide font-semibold">Admin Account</p>
+                <p className="text-xs text-slate-400 mb-0.5 uppercase tracking-wide font-semibold">{t('admin.title')}</p>
                 <p className="text-white font-medium text-sm truncate">{admin?.email || 'admin@example.com'}</p>
               </div>
             </div>
@@ -207,7 +208,7 @@ export default function AdminLayout() {
             className="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-all duration-300 group"
           >
             <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-            <span className="font-semibold">Logout</span>
+            <span className="font-semibold">{t('admin.logout')}</span>
           </motion.button>
         </div>
       </motion.aside>
