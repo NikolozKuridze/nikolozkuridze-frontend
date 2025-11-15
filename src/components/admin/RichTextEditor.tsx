@@ -66,15 +66,15 @@ const copyToClipboard = (text: string) => {
 export default function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillInstanceRef = useRef<Quill | null>(null);
-  const onChangeRef = useRef(onChange);
-
-  // Keep onChange ref up-to-date
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
+  const isUpdatingRef = useRef(false);
 
   useEffect(() => {
-    if (!editorRef.current || quillInstanceRef.current) return;
+    if (!editorRef.current) return;
+
+    // Cleanup function to prevent memory leaks
+    if (quillInstanceRef.current) {
+      return;
+    }
 
     try {
       // Initialize Quill with proper configuration
@@ -111,40 +111,63 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
 
       quillInstanceRef.current = quill;
 
-      // Set initial value
-      if (value) {
-        quill.root.innerHTML = value;
-      }
+      // Set initial value (even if empty, to ensure proper initialization)
+      const initialValue = value || '';
+      quill.root.innerHTML = initialValue;
+      console.log('✅ Quill initialized with content length:', initialValue.length);
 
-      // Handle text changes - use ref to always get latest onChange
+      // Handle text changes - CRITICAL FIX: Call onChange immediately
       quill.on('text-change', () => {
+        if (isUpdatingRef.current) {
+          // Skip if we're updating from external value change
+          return;
+        }
+
         const html = quill.root.innerHTML;
-        console.log('🔄 Quill text-change event fired, content length:', html.length);
-        // Use the ref to call the latest onChange callback
-        onChangeRef.current(html);
+        console.log('🔄 Quill text-change event, calling onChange with length:', html.length, 'content:', html.substring(0, 100));
+        onChange(html);
       });
 
+      console.log('✅ Quill editor initialized successfully');
+
     } catch (error) {
-      console.error('Error initializing Quill editor:', error);
+      console.error('❌ Error initializing Quill editor:', error);
     }
 
     return () => {
       if (quillInstanceRef.current) {
+        console.log('🧹 Cleaning up Quill instance');
         quillInstanceRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value, onChange]);
 
   useEffect(() => {
-    // Update content when value changes externally
-    if (quillInstanceRef.current && value !== quillInstanceRef.current.root.innerHTML) {
-      console.log('📥 External value changed, updating editor. New value length:', value.length);
-      const selection = quillInstanceRef.current.getSelection();
-      quillInstanceRef.current.root.innerHTML = value;
+    if (!quillInstanceRef.current) return;
+
+    const quill = quillInstanceRef.current;
+    const currentContent = quill.root.innerHTML;
+
+    // Normalize both strings for comparison to avoid unnecessary updates
+    const normalizeHtml = (html: string) => html.replace(/\s+/g, ' ').trim();
+    const normalizedValue = normalizeHtml(value || '');
+    const normalizedCurrent = normalizeHtml(currentContent);
+
+    // Only update if content is actually different
+    if (normalizedValue !== normalizedCurrent) {
+      console.log('📥 External value changed, updating editor.');
+      console.log('  Old:', normalizedCurrent.substring(0, 100));
+      console.log('  New:', normalizedValue.substring(0, 100));
+
+      isUpdatingRef.current = true;
+      const selection = quill.getSelection();
+      quill.root.innerHTML = value || '';
       if (selection) {
-        quillInstanceRef.current.setSelection(selection);
+        setTimeout(() => {
+          quill.setSelection(selection);
+        }, 0);
       }
+      isUpdatingRef.current = false;
     }
   }, [value]);
 
