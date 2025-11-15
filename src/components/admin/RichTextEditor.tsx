@@ -66,6 +66,12 @@ const copyToClipboard = (text: string) => {
 export default function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillInstanceRef = useRef<Quill | null>(null);
+  const onChangeRef = useRef(onChange);
+
+  // Keep onChange ref up-to-date
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (!editorRef.current || quillInstanceRef.current) return;
@@ -110,10 +116,12 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         quill.root.innerHTML = value;
       }
 
-      // Handle text changes
+      // Handle text changes - use ref to always get latest onChange
       quill.on('text-change', () => {
         const html = quill.root.innerHTML;
-        onChange(html);
+        console.log('🔄 Quill text-change event fired, content length:', html.length);
+        // Use the ref to call the latest onChange callback
+        onChangeRef.current(html);
       });
 
     } catch (error) {
@@ -131,6 +139,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   useEffect(() => {
     // Update content when value changes externally
     if (quillInstanceRef.current && value !== quillInstanceRef.current.root.innerHTML) {
+      console.log('📥 External value changed, updating editor. New value length:', value.length);
       const selection = quillInstanceRef.current.getSelection();
       quillInstanceRef.current.root.innerHTML = value;
       if (selection) {
