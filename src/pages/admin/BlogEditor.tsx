@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { blogService } from '../../services/api.service';
 import RichTextEditor from '../../components/admin/RichTextEditor';
-import { Save, X } from 'lucide-react';
+import { Save, X, Sparkles, AlertCircle } from 'lucide-react';
 import type { Author } from '../../types/api';
 
 interface BlogForm {
@@ -21,12 +20,10 @@ interface BlogForm {
 }
 
 export default function BlogEditor() {
-  const { t, ready } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
 
-  // All hooks must be called before any conditional returns
   const [form, setForm] = useState<BlogForm>({
     title: { en: '', ka: '' },
     slug: '',
@@ -35,13 +32,14 @@ export default function BlogEditor() {
     category: 'article',
     tags: '',
     thumbnail: '',
-    author: { name: '', bio: '', avatar: '' },
+    author: { name: 'Nikoloz Kuridze', bio: 'Enterprise Solution Architect', avatar: '' },
     published: false,
     featured: false
   });
 
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const fetchBlog = useCallback(async () => {
     if (!id) return;
@@ -56,16 +54,16 @@ export default function BlogEditor() {
         category: blog.category,
         tags: blog.tags?.join(', ') || '',
         thumbnail: blog.thumbnail || '',
-        author: blog.author || { name: '', bio: '', avatar: '' },
+        author: blog.author || { name: 'Nikoloz Kuridze', bio: 'Enterprise Solution Architect', avatar: '' },
         published: blog.published,
         featured: blog.featured
       });
     } catch (error) {
       console.error('Error fetching blog:', error);
-      toast.error(t('admin.common.error') || 'Failed to load blog');
+      toast.error('Failed to load blog');
       navigate('/admin/blogs');
     }
-  }, [id, t, navigate]);
+  }, [id, navigate]);
 
   useEffect(() => {
     if (isEdit) {
@@ -73,17 +71,37 @@ export default function BlogEditor() {
     }
   }, [isEdit, fetchBlog]);
 
-  // Loading state while translations load
-  if (!ready) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-white text-lg">Loading editor...</div>
-      </div>
-    );
-  }
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!form.title.en.trim()) {
+      newErrors.titleEn = 'English title is required';
+    }
+    if (!form.slug.trim()) {
+      newErrors.slug = 'Slug is required';
+    }
+    if (!form.description.en.trim()) {
+      newErrors.descriptionEn = 'English description is required';
+    }
+    if (!form.content.en.trim() || form.content.en === '<p><br></p>') {
+      newErrors.contentEn = 'English content is required';
+    }
+    if (!form.author.name.trim()) {
+      newErrors.authorName = 'Author name is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     setLoading(true);
 
     const blogData = {
@@ -108,7 +126,7 @@ export default function BlogEditor() {
       {
         loading: isEdit ? 'Updating blog...' : 'Creating blog...',
         success: isEdit ? 'Blog updated successfully!' : 'Blog created successfully!',
-        error: isEdit ? 'Failed to update blog' : 'Failed to create blog',
+        error: (err) => err?.message || (isEdit ? 'Failed to update blog' : 'Failed to create blog'),
       }
     );
 
@@ -131,12 +149,32 @@ export default function BlogEditor() {
   };
 
   return (
-    <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          {isEdit ? t('admin.blog.edit') : t('admin.blog.create')}
-        </h1>
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent mb-2">
+            {isEdit ? 'Edit Blog Post' : 'Create New Blog Post'}
+          </h1>
+          <p className="text-slate-400">
+            {isEdit ? 'Update your blog content' : 'Share your thoughts and insights'}
+          </p>
+        </div>
+        <Sparkles className="w-8 h-8 text-emerald-400 animate-pulse" />
       </div>
+
+      {Object.keys(errors).length > 0 && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-red-400 font-semibold mb-1">Please fix the following errors:</p>
+            <ul className="text-red-300 text-sm space-y-1">
+              {Object.values(errors).map((error, index) => (
+                <li key={index}>• {error}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Language Tabs */}
@@ -144,24 +182,30 @@ export default function BlogEditor() {
           <button
             type="button"
             onClick={() => setActiveTab('en')}
-            className={`px-6 py-3 font-medium transition-colors ${
+            className={`px-6 py-3 font-medium transition-colors relative ${
               activeTab === 'en'
-                ? 'text-sky-400 border-b-2 border-sky-400'
+                ? 'text-emerald-400'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            {t('admin.common.english')}
+            English
+            {activeTab === 'en' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
+            )}
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('ka')}
-            className={`px-6 py-3 font-medium transition-colors ${
+            className={`px-6 py-3 font-medium transition-colors relative ${
               activeTab === 'ka'
-                ? 'text-sky-400 border-b-2 border-sky-400'
+                ? 'text-emerald-400'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            {t('admin.common.georgian')}
+            Georgian
+            {activeTab === 'ka' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
+            )}
           </button>
         </div>
 
@@ -171,7 +215,7 @@ export default function BlogEditor() {
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.title')} ({activeTab.toUpperCase()})
+                Title ({activeTab.toUpperCase()}) *
               </label>
               <input
                 type="text"
@@ -184,14 +228,17 @@ export default function BlogEditor() {
                 }
                 onBlur={() => activeTab === 'en' && !form.slug && generateSlug()}
                 required
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className={`w-full px-4 py-3 bg-slate-900/50 border ${
+                  errors.titleEn && activeTab === 'en' ? 'border-red-500' : 'border-slate-600'
+                } rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                placeholder="Enter blog title..."
               />
             </div>
 
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.description')} ({activeTab.toUpperCase()})
+                Description ({activeTab.toUpperCase()}) *
               </label>
               <textarea
                 value={form.description[activeTab]}
@@ -203,15 +250,21 @@ export default function BlogEditor() {
                 }
                 required
                 rows={3}
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className={`w-full px-4 py-3 bg-slate-900/50 border ${
+                  errors.descriptionEn && activeTab === 'en' ? 'border-red-500' : 'border-slate-600'
+                } rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                placeholder="Brief description of your blog post..."
               />
             </div>
 
             {/* Content */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.content')} ({activeTab.toUpperCase()})
+                Content ({activeTab.toUpperCase()}) *
               </label>
+              {errors.contentEn && activeTab === 'en' && (
+                <p className="text-red-400 text-sm mb-2">Content is required</p>
+              )}
               <RichTextEditor
                 value={form.content[activeTab]}
                 onChange={(value) =>
@@ -228,15 +281,18 @@ export default function BlogEditor() {
           <div className="space-y-6">
             {/* Actions */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <h3 className="text-white font-semibold mb-4">Actions</h3>
+              <h3 className="text-white font-semibold mb-4 flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <span>Actions</span>
+              </h3>
               <div className="space-y-3">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50"
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
                 >
                   <Save className="w-5 h-5" />
-                  <span>{loading ? t('admin.common.loading') : t('admin.blog.save')}</span>
+                  <span>{loading ? 'Saving...' : 'Save Blog'}</span>
                 </button>
                 <button
                   type="button"
@@ -244,7 +300,7 @@ export default function BlogEditor() {
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-300"
                 >
                   <X className="w-5 h-5" />
-                  <span>{t('admin.blog.cancel')}</span>
+                  <span>Cancel</span>
                 </button>
               </div>
             </div>
@@ -252,45 +308,55 @@ export default function BlogEditor() {
             {/* Slug */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.slug')}
+                URL Slug *
               </label>
               <input
                 type="text"
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
                 required
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className={`w-full px-4 py-2 bg-slate-900/50 border ${
+                  errors.slug ? 'border-red-500' : 'border-slate-600'
+                } rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                placeholder="url-friendly-slug"
               />
+              <button
+                type="button"
+                onClick={generateSlug}
+                className="mt-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                Generate from title
+              </button>
             </div>
 
             {/* Category */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.category')}
+                Category
               </label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
-                <option value="tutorial">{t('admin.blog.categories.tutorial')}</option>
-                <option value="tip">{t('admin.blog.categories.tip')}</option>
-                <option value="article">{t('admin.blog.categories.article')}</option>
-                <option value="news">{t('admin.blog.categories.news')}</option>
+                <option value="tutorial">Tutorial</option>
+                <option value="tip">Tip</option>
+                <option value="article">Article</option>
+                <option value="news">News</option>
               </select>
             </div>
 
             {/* Tags */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.tags')}
+                Tags
               </label>
               <input
                 type="text"
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
                 placeholder="react, javascript, tutorial"
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
               <p className="text-xs text-slate-400 mt-2">Comma separated</p>
             </div>
@@ -298,20 +364,20 @@ export default function BlogEditor() {
             {/* Thumbnail */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.blog.thumbnail')}
+                Thumbnail URL
               </label>
               <input
                 type="text"
                 value={form.thumbnail}
                 onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
                 placeholder="https://..."
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             {/* Author */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <h3 className="text-white font-semibold mb-4">Author</h3>
+              <h3 className="text-white font-semibold mb-4">Author *</h3>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -326,7 +392,9 @@ export default function BlogEditor() {
                     })}
                     required
                     placeholder="John Doe"
-                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className={`w-full px-4 py-2 bg-slate-900/50 border ${
+                      errors.authorName ? 'border-red-500' : 'border-slate-600'
+                    } rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
                   />
                 </div>
                 <div>
@@ -341,7 +409,7 @@ export default function BlogEditor() {
                     })}
                     rows={2}
                     placeholder="Short bio..."
-                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
                 <div>
@@ -356,7 +424,7 @@ export default function BlogEditor() {
                       author: { ...form.author, avatar: e.target.value }
                     })}
                     placeholder="https://..."
-                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
               </div>
@@ -366,29 +434,29 @@ export default function BlogEditor() {
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 space-y-4">
               <h3 className="text-white font-semibold">Settings</h3>
 
-              <label className="flex items-center space-x-3 cursor-pointer">
+              <label className="flex items-center space-x-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={form.published}
                   onChange={(e) => setForm({ ...form, published: e.target.checked })}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-sky-500 focus:ring-2 focus:ring-sky-500"
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 />
-                <span className="text-slate-300">{t('admin.blog.published')}</span>
+                <span className="text-slate-300 group-hover:text-white transition-colors">Published</span>
               </label>
 
-              <label className="flex items-center space-x-3 cursor-pointer">
+              <label className="flex items-center space-x-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={form.featured}
                   onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-sky-500 focus:ring-2 focus:ring-sky-500"
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 />
-                <span className="text-slate-300">{t('admin.blog.featured')}</span>
+                <span className="text-slate-300 group-hover:text-white transition-colors">Featured</span>
               </label>
             </div>
           </div>
         </div>
       </form>
-    </>
+    </div>
   );
 }

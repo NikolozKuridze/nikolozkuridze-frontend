@@ -1,5 +1,4 @@
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAdminStore } from '../../store/adminStore';
 import {
   LayoutDashboard,
@@ -16,7 +15,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminLayout() {
-  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const logout = useAdminStore((state) => state.logout);
@@ -28,22 +26,23 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
+  // Fixed: Using static labels instead of translation keys that return objects
   const navItems = [
     {
       path: '/admin/dashboard',
-      label: t('admin.dashboard'),
+      label: 'Dashboard',
       icon: LayoutDashboard,
       gradient: 'from-sky-500 to-blue-600'
     },
     {
       path: '/admin/blogs',
-      label: t('admin.blogs'),
+      label: 'Blogs',
       icon: BookOpen,
       gradient: 'from-emerald-500 to-green-600'
     },
     {
       path: '/admin/projects',
-      label: t('admin.projects'),
+      label: 'Projects',
       icon: FolderGit2,
       gradient: 'from-purple-500 to-violet-600'
     }
@@ -116,7 +115,7 @@ export default function AdminLayout() {
                   Nikoloz Kuridze
                 </h2>
                 <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-                  {t('admin.title')}
+                  Admin Panel
                 </p>
               </div>
             </motion.div>
@@ -208,7 +207,7 @@ export default function AdminLayout() {
             className="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-all duration-300 group"
           >
             <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-            <span className="font-semibold">{t('admin.logout')}</span>
+            <span className="font-semibold">Logout</span>
           </motion.button>
         </div>
       </motion.aside>

@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+
+// Import highlight.js and configure it
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 
-// Register languages for syntax highlighting
+// Register commonly used languages
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
 import css from 'highlight.js/lib/languages/css';
@@ -12,8 +14,9 @@ import python from 'highlight.js/lib/languages/python';
 import bash from 'highlight.js/lib/languages/bash';
 import json from 'highlight.js/lib/languages/json';
 import markdown from 'highlight.js/lib/languages/markdown';
-import xml from 'highlight.js/lib/languages/xml'; // For JSX/TSX
+import xml from 'highlight.js/lib/languages/xml';
 
+// Register languages
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('css', css);
@@ -22,18 +25,11 @@ hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('json', json);
 hljs.registerLanguage('markdown', markdown);
 hljs.registerLanguage('xml', xml);
+hljs.registerLanguage('html', xml);
 
-// Extend Window interface to include hljs
-declare global {
-  interface Window {
-    hljs: typeof hljs;
-  }
-}
-
-// Expose hljs to window for Quill's syntax module
-// Quill's syntax module expects window.hljs to be available globally
+// Make hljs available globally for Quill
 if (typeof window !== 'undefined') {
-  window.hljs = hljs;
+  (window as any).hljs = hljs;
 }
 
 interface RichTextEditorProps {
@@ -48,46 +44,60 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   useEffect(() => {
     if (!editorRef.current || quillInstanceRef.current) return;
 
-    // Initialize Quill
-    const quill = new Quill(editorRef.current, {
-      theme: 'snow',
-      placeholder: 'Write your blog content here...',
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, 4, 5, 6, false] }],
-          [{ font: [] }],
-          [{ size: ['small', false, 'large', 'huge'] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ color: [] }, { background: [] }],
-          [{ script: 'sub' }, { script: 'super' }],
-          ['blockquote', 'code-block'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ indent: '-1' }, { indent: '+1' }],
-          [{ align: [] }],
-          ['link', 'image', 'video'],
-          ['clean']
-        ],
-        syntax: {
-          highlight: (text: string) => hljs.highlightAuto(text).value
+    try {
+      // Initialize Quill with proper configuration
+      const quill = new Quill(editorRef.current, {
+        theme: 'snow',
+        placeholder: 'Write your blog content here...',
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            [{ font: [] }],
+            [{ size: ['small', false, 'large', 'huge'] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ script: 'sub' }, { script: 'super' }],
+            ['blockquote', 'code-block'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
+            [{ align: [] }],
+            ['link', 'image', 'video'],
+            ['clean']
+          ],
+          syntax: {
+            highlight: (text: string) => {
+              try {
+                return hljs.highlightAuto(text).value;
+              } catch (e) {
+                console.error('Syntax highlighting error:', e);
+                return text;
+              }
+            }
+          }
         }
+      });
+
+      quillInstanceRef.current = quill;
+
+      // Set initial value
+      if (value) {
+        quill.root.innerHTML = value;
       }
-    });
 
-    quillInstanceRef.current = quill;
+      // Handle text changes
+      quill.on('text-change', () => {
+        const html = quill.root.innerHTML;
+        onChange(html);
+      });
 
-    // Set initial value
-    if (value) {
-      quill.root.innerHTML = value;
+    } catch (error) {
+      console.error('Error initializing Quill editor:', error);
     }
 
-    // Handle text changes
-    quill.on('text-change', () => {
-      const html = quill.root.innerHTML;
-      onChange(html);
-    });
-
     return () => {
-      quillInstanceRef.current = null;
+      if (quillInstanceRef.current) {
+        quillInstanceRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -102,7 +112,6 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
       }
     }
   }, [value]);
-
 
   return (
     <div className="rich-text-editor">
@@ -165,6 +174,11 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
           color: rgb(56, 189, 248);
           padding: 0.125rem 0.375rem;
           border-radius: 0.25rem;
+        }
+        .rich-text-editor .ql-syntax {
+          background-color: #1e1e1e !important;
+          color: #d4d4d4 !important;
+          overflow: visible !important;
         }
       `}</style>
       <div ref={editorRef} />
