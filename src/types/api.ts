@@ -11,31 +11,37 @@ export interface AuthLoginResponse {
   success: boolean;
   token: string;
   admin: Admin;
+  message?: string;
 }
 
 export interface AuthVerifyResponse {
   success: boolean;
   admin: Admin;
+  message?: string;
 }
 
 export interface BlogsResponse {
   success: boolean;
   blogs: Blog[];
+  message?: string;
 }
 
 export interface BlogResponse {
   success: boolean;
   blog: Blog;
+  message?: string;
 }
 
 export interface ProjectsResponse {
   success: boolean;
   projects: Project[];
+  message?: string;
 }
 
 export interface ProjectResponse {
   success: boolean;
   project: Project;
+  message?: string;
 }
 
 export interface MessageResponse {
