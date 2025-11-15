@@ -73,8 +73,20 @@ export default function BlogEditor() {
     }
   }, [isEdit, fetchBlog]);
 
+  // FIXED: Better content validation that handles Quill's HTML properly
   const isContentEmpty = (content: string): boolean => {
-    const textContent = content.replace(/<[^>]*>/g, '').trim();
+    if (!content || content.trim() === '') return true;
+    
+    // Remove all HTML tags and whitespace
+    const textContent = content
+      .replace(/<br\s*\/?>/gi, '') // Remove <br> tags
+      .replace(/<p><\/p>/gi, '') // Remove empty <p> tags
+      .replace(/<p>\s*<\/p>/gi, '') // Remove <p> tags with only whitespace
+      .replace(/<[^>]*>/g, '') // Remove all other HTML tags
+      .replace(/&nbsp;/g, '') // Remove HTML entities
+      .trim();
+    
+    // Check if there's any actual content
     return textContent.length === 0;
   };
 
@@ -90,9 +102,19 @@ export default function BlogEditor() {
     if (!form.description.en.trim()) {
       newErrors.descriptionEn = 'English description is required';
     }
-    if (isContentEmpty(form.content.en)) {
+    
+    // FIXED: Better content validation
+    const contentIsEmpty = isContentEmpty(form.content.en);
+    console.log('Content validation:', {
+      raw: form.content.en,
+      isEmpty: contentIsEmpty,
+      length: form.content.en.length
+    });
+    
+    if (contentIsEmpty) {
       newErrors.contentEn = 'English content is required';
     }
+    
     if (!form.author.name.trim()) {
       newErrors.authorName = 'Author name is required';
     }
@@ -104,8 +126,18 @@ export default function BlogEditor() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Log current form state for debugging
+    console.log('Form submission attempted:', {
+      titleEn: form.title.en,
+      contentEn: form.content.en,
+      contentEnLength: form.content.en.length,
+      slug: form.slug
+    });
+    
     if (!validateForm()) {
       toast.error('Please fill in all required fields');
+      // Scroll to top to show errors
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -124,6 +156,8 @@ export default function BlogEditor() {
       featured: form.featured
     };
 
+    console.log('Submitting blog data:', blogData);
+
     const savePromise = isEdit && id
       ? blogService.update(id, blogData)
       : blogService.create(blogData);
@@ -133,7 +167,10 @@ export default function BlogEditor() {
       {
         loading: isEdit ? 'Updating blog...' : 'Creating blog...',
         success: isEdit ? 'Blog updated successfully!' : 'Blog created successfully!',
-        error: (err) => err?.message || (isEdit ? 'Failed to update blog' : 'Failed to create blog'),
+        error: (err) => {
+          console.error('Save error:', err);
+          return err?.message || (isEdit ? 'Failed to update blog' : 'Failed to create blog');
+        },
       }
     );
 
@@ -153,6 +190,27 @@ export default function BlogEditor() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
     setForm({ ...form, slug });
+  };
+
+  // FIXED: Update content handlers with logging
+  const handleEnglishContentChange = (value: string) => {
+    console.log('English content changed:', { length: value.length, value: value.substring(0, 100) });
+    setForm({
+      ...form,
+      content: { ...form.content, en: value }
+    });
+    // Clear error when content is added
+    if (!isContentEmpty(value) && errors.contentEn) {
+      setErrors({ ...errors, contentEn: '' });
+    }
+  };
+
+  const handleGeorgianContentChange = (value: string) => {
+    console.log('Georgian content changed:', { length: value.length, value: value.substring(0, 100) });
+    setForm({
+      ...form,
+      content: { ...form.content, ka: value }
+    });
   };
 
   return (
@@ -264,38 +322,40 @@ export default function BlogEditor() {
               />
             </div>
 
-            {/* Content - FIXED: Render separate editors for each language */}
+            {/* Content - FIXED: Separate editors with proper state management */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 {t('admin.blog.content')} ({activeTab.toUpperCase()}) *
               </label>
               {errors.contentEn && activeTab === 'en' && (
-                <p className="text-red-400 text-sm mb-2">Content is required</p>
+                <p className="text-red-400 text-sm mb-2 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Content is required - please add some text
+                </p>
               )}
-              {/* English Editor - Only shown when English tab is active */}
-              {activeTab === 'en' && (
+              
+              {/* Debug info in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mb-2 p-2 bg-slate-800 rounded text-xs text-slate-400">
+                  Content length: {form.content[activeTab].length} chars
+                </div>
+              )}
+              
+              {/* English Editor */}
+              <div style={{ display: activeTab === 'en' ? 'block' : 'none' }}>
                 <RichTextEditor
                   value={form.content.en}
-                  onChange={(value) =>
-                    setForm({
-                      ...form,
-                      content: { ...form.content, en: value }
-                    })
-                  }
+                  onChange={handleEnglishContentChange}
                 />
-              )}
-              {/* Georgian Editor - Only shown when Georgian tab is active */}
-              {activeTab === 'ka' && (
+              </div>
+              
+              {/* Georgian Editor */}
+              <div style={{ display: activeTab === 'ka' ? 'block' : 'none' }}>
                 <RichTextEditor
                   value={form.content.ka}
-                  onChange={(value) =>
-                    setForm({
-                      ...form,
-                      content: { ...form.content, ka: value }
-                    })
-                  }
+                  onChange={handleGeorgianContentChange}
                 />
-              )}
+              </div>
             </div>
           </div>
 
