@@ -23,6 +23,12 @@ hljs.registerLanguage('json', json);
 hljs.registerLanguage('markdown', markdown);
 hljs.registerLanguage('xml', xml);
 
+// Expose hljs to window for Quill's syntax module
+// Quill's syntax module expects window.hljs to be available globally
+if (typeof window !== 'undefined') {
+  (window as any).hljs = hljs;
+}
+
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
