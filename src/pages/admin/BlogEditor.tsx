@@ -73,6 +73,12 @@ export default function BlogEditor() {
     }
   }, [isEdit, fetchBlog]);
 
+  const isContentEmpty = (content: string): boolean => {
+    // Remove all HTML tags and check if there's any actual text content
+    const textContent = content.replace(/<[^>]*>/g, '').trim();
+    return textContent.length === 0;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -85,7 +91,7 @@ export default function BlogEditor() {
     if (!form.description.en.trim()) {
       newErrors.descriptionEn = 'English description is required';
     }
-    if (!form.content.en.trim() || form.content.en === '<p><br></p>') {
+    if (isContentEmpty(form.content.en)) {
       newErrors.contentEn = 'English content is required';
     }
     if (!form.author.name.trim()) {
@@ -268,6 +274,7 @@ export default function BlogEditor() {
                 <p className="text-red-400 text-sm mb-2">Content is required</p>
               )}
               <RichTextEditor
+                key={activeTab}
                 value={form.content[activeTab]}
                 onChange={(value) =>
                   setForm({
