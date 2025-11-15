@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 // import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import AdminLayout from '../../components/admin/AdminLayout';
-import { Plus, Edit, Trash2, Eye, BookOpen } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, BookOpen, Search, Filter, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Blog {
   _id: string;
@@ -96,11 +97,40 @@ export default function AdminBlogs() {
     */
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredBlogs = blogs.filter(blog => {
+    const title = blog.title[i18n.language as 'en' | 'ka'] || blog.title.en;
+    return title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           blog.slug.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   if (loading) {
     return (
       <AdminLayout>
-        <div className="text-center py-12">
-          <p className="text-slate-400">{t('admin.common.loading')}</p>
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="animate-pulse">
+              <div className="h-8 bg-slate-800/50 rounded w-32 mb-2" />
+              <div className="h-4 bg-slate-800/30 rounded w-48" />
+            </div>
+            <div className="h-12 bg-slate-800/50 rounded-lg w-32" />
+          </div>
+
+          {/* Search skeleton */}
+          <div className="h-12 bg-slate-800/30 rounded-xl animate-pulse" />
+
+          {/* Table skeleton */}
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl border border-slate-700/50 overflow-hidden animate-pulse">
+            <div className="p-6 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center space-x-4">
+                  <div className="h-16 bg-slate-700/50 rounded flex-1" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </AdminLayout>
     );
@@ -108,115 +138,215 @@ export default function AdminBlogs() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-8">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4"
+      >
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent mb-2">
             {t('admin.blogs')}
           </h1>
-          <p className="text-slate-400">
-            Manage your blog posts
+          <p className="text-slate-400 text-lg">
+            Manage and organize your blog content
           </p>
         </div>
-        <Link
-          to="/admin/blogs/new"
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all duration-300"
-        >
-          <Plus className="w-5 h-5" />
-          <span>{t('admin.blog.create')}</span>
+        <Link to="/admin/blogs/new">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center space-x-2 px-6 py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl hover:from-sky-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-sky-500/20 font-semibold"
+          >
+            <Plus className="w-5 h-5" />
+            <span>{t('admin.blog.create')}</span>
+          </motion.button>
         </Link>
-      </div>
+      </motion.div>
 
-      <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700 overflow-hidden">
+      {/* Search and Filters */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-6 flex flex-col md:flex-row gap-4"
+      >
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search blogs by title or slug..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition-all"
+          />
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center space-x-2 px-6 py-3.5 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-slate-300 hover:text-white hover:border-slate-600/50 transition-all"
+        >
+          <Filter className="w-5 h-5" />
+          <span className="font-medium">Filters</span>
+        </motion.button>
+      </motion.div>
+
+      {/* Blog Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-slate-800/30 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden"
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700">
-                <th className="text-left px-6 py-4 text-slate-300 font-semibold">
+              <tr className="border-b border-slate-700/50 bg-slate-800/30">
+                <th className="text-left px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
                   {t('admin.blog.title')}
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-semibold">
+                <th className="text-left px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
                   {t('admin.blog.category')}
                 </th>
-                <th className="text-center px-6 py-4 text-slate-300 font-semibold">
+                <th className="text-center px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
                   Status
                 </th>
-                <th className="text-center px-6 py-4 text-slate-300 font-semibold">
-                  <Eye className="w-5 h-5 inline" />
+                <th className="text-center px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
+                  <div className="flex items-center justify-center space-x-1">
+                    <Eye className="w-4 h-4" />
+                    <span>Views</span>
+                  </div>
                 </th>
-                <th className="text-right px-6 py-4 text-slate-300 font-semibold">
+                <th className="text-right px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
                   {t('admin.common.actions')}
                 </th>
               </tr>
             </thead>
             <tbody>
-              {blogs.map((blog) => (
-                <tr
-                  key={blog._id}
-                  className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors"
-                >
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="text-white font-medium">
-                        {blog.title[i18n.language as 'en' | 'ka'] || blog.title.en}
-                      </p>
-                      <p className="text-sm text-slate-400">/{blog.slug}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300">
-                      {t(`admin.blog.categories.${blog.category}`)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center space-x-2">
-                      {blog.published ? (
-                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-slate-500/20 text-slate-300">
-                          Draft
-                        </span>
-                      )}
-                      {blog.featured && (
-                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300">
-                          Featured
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-center text-slate-300">
-                    {blog.views}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end space-x-2">
-                      <Link
-                        to={`/admin/blogs/edit/${blog._id}`}
-                        className="p-2 text-sky-400 hover:bg-sky-500/10 rounded-lg transition-colors"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(blog._id)}
-                        className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              <AnimatePresence>
+                {filteredBlogs.map((blog, index) => (
+                  <motion.tr
+                    key={blog._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-all duration-200 group"
+                  >
+                    <td className="px-6 py-5">
+                      <div>
+                        <p className="text-white font-semibold mb-1 group-hover:text-sky-400 transition-colors">
+                          {blog.title[i18n.language as 'en' | 'ka'] || blog.title.en}
+                        </p>
+                        <p className="text-sm text-slate-500 font-mono">/{blog.slug}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className="inline-flex px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                        {t(`admin.blog.categories.${blog.category}`)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center space-x-2">
+                        {blog.published ? (
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 animate-pulse" />
+                            Published
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-500/10 text-slate-300 border border-slate-500/20">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2" />
+                            Draft
+                          </span>
+                        )}
+                        {blog.featured && (
+                          <span className="inline-flex px-2 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                            ⭐
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <Eye className="w-4 h-4 text-slate-400" />
+                        <span className="text-slate-300 font-semibold">{blog.views.toLocaleString()}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-end space-x-2">
+                        <Link to={`/admin/blogs/edit/${blog._id}`}>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="p-2.5 text-sky-400 hover:bg-sky-500/10 rounded-lg transition-colors border border-transparent hover:border-sky-500/20"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </motion.button>
+                        </Link>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDelete(blog._id)}
+                          className="p-2.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </motion.button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
 
-        {blogs.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400">No blogs yet. Create your first one!</p>
-          </div>
+        {filteredBlogs.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
+            <div className="inline-flex p-6 rounded-2xl bg-slate-800/30 mb-4">
+              <BookOpen className="w-12 h-12 text-slate-600" />
+            </div>
+            <p className="text-slate-400 text-lg mb-2">
+              {searchQuery ? 'No blogs found matching your search' : 'No blogs yet'}
+            </p>
+            <p className="text-slate-500 text-sm">
+              {searchQuery ? 'Try a different search term' : 'Create your first blog post to get started'}
+            </p>
+            {!searchQuery && (
+              <Link to="/admin/blogs/new">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="mt-6 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-sky-500/20"
+                >
+                  Create Your First Blog
+                </motion.button>
+              </Link>
+            )}
+          </motion.div>
         )}
-      </div>
+      </motion.div>
+
+      {/* Stats Footer */}
+      {filteredBlogs.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-6 flex items-center justify-between text-sm text-slate-400"
+        >
+          <div className="flex items-center space-x-4">
+            <span>Showing {filteredBlogs.length} of {blogs.length} blogs</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Calendar className="w-4 h-4" />
+            <span>Last updated: Today</span>
+          </div>
+        </motion.div>
+      )}
     </AdminLayout>
   );
 }
