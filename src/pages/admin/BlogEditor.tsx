@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 // import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
-import AdminLayout from '../../components/admin/AdminLayout';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { Save, X } from 'lucide-react';
 
@@ -136,7 +135,7 @@ export default function BlogEditor() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
           {isEdit ? t('admin.blog.edit') : t('admin.blog.create')}
@@ -341,6 +340,6 @@ export default function BlogEditor() {
           </div>
         </div>
       </form>
-    </AdminLayout>
+    </>
   );
 }

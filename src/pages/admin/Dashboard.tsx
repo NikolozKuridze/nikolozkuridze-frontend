@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 // import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
 import { BookOpen, FolderGit2, Eye, TrendingUp, ArrowUpRight, Plus, Clock, Star } from 'lucide-react';
-import AdminLayout from '../../components/admin/AdminLayout';
 import { motion } from 'framer-motion';
 
 export default function AdminDashboard() {
@@ -111,33 +110,31 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="space-y-8">
-          {/* Header skeleton */}
-          <div className="animate-pulse">
-            <div className="h-8 bg-slate-800/50 rounded w-48 mb-2" />
-            <div className="h-4 bg-slate-800/30 rounded w-64" />
-          </div>
-
-          {/* Stats skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50 animate-pulse">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-14 h-14 rounded-xl bg-slate-700/50" />
-                </div>
-                <div className="h-4 bg-slate-700/50 rounded w-24 mb-2" />
-                <div className="h-8 bg-slate-700/50 rounded w-16" />
-              </div>
-            ))}
-          </div>
+      <div className="space-y-8">
+        {/* Header skeleton */}
+        <div className="animate-pulse">
+          <div className="h-8 bg-slate-800/50 rounded w-48 mb-2" />
+          <div className="h-4 bg-slate-800/30 rounded w-64" />
         </div>
-      </AdminLayout>
+
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50 animate-pulse">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-xl bg-slate-700/50" />
+              </div>
+              <div className="h-4 bg-slate-700/50 rounded w-24 mb-2" />
+              <div className="h-8 bg-slate-700/50 rounded w-16" />
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
+    <>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -298,6 +295,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </motion.div>
-    </AdminLayout>
+    </>
   );
 }
