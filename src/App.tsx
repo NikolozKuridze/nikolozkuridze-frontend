@@ -14,6 +14,7 @@ import BlogEditor from './pages/admin/BlogEditor';
 import AdminProjects from './pages/admin/Projects';
 import ProjectEditor from './pages/admin/ProjectEditor';
 import ProtectedRoute from './components/admin/ProtectedRoute';
+import AdminLayout from './components/admin/AdminLayout';
 import './styles/globals.css';
 
 function HomePage() {
@@ -40,64 +41,26 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
 
-          {/* Admin Routes */}
+          {/* Admin Login Route - No Layout */}
           <Route path="/admin/login" element={<AdminLogin />} />
+
+          {/* Admin Routes - Protected with Layout */}
           <Route
-            path="/admin/dashboard"
+            path="/admin"
             element={
               <ProtectedRoute>
-                <AdminDashboard />
+                <AdminLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/admin/blogs"
-            element={
-              <ProtectedRoute>
-                <AdminBlogs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/blogs/new"
-            element={
-              <ProtectedRoute>
-                <BlogEditor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/blogs/edit/:id"
-            element={
-              <ProtectedRoute>
-                <BlogEditor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/projects"
-            element={
-              <ProtectedRoute>
-                <AdminProjects />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/projects/new"
-            element={
-              <ProtectedRoute>
-                <ProjectEditor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/projects/edit/:id"
-            element={
-              <ProtectedRoute>
-                <ProjectEditor />
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="blogs" element={<AdminBlogs />} />
+            <Route path="blogs/new" element={<BlogEditor />} />
+            <Route path="blogs/edit/:id" element={<BlogEditor />} />
+            <Route path="projects" element={<AdminProjects />} />
+            <Route path="projects/new" element={<ProjectEditor />} />
+            <Route path="projects/edit/:id" element={<ProjectEditor />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

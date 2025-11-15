@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 // import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
-import AdminLayout from '../../components/admin/AdminLayout';
 import { Save, X } from 'lucide-react';
 
 interface ProjectForm {
@@ -130,7 +129,7 @@ export default function ProjectEditor() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
           {isEdit ? t('admin.project.edit') : t('admin.project.create')}
@@ -363,6 +362,6 @@ export default function ProjectEditor() {
           </div>
         </div>
       </form>
-    </AdminLayout>
+    </>
   );
 }

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 // import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
-import AdminLayout from '../../components/admin/AdminLayout';
 import { Plus, Edit, Trash2, ExternalLink, Github, Search, Grid3x3, List, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -105,37 +104,35 @@ export default function AdminProjects() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="space-y-6">
-          {/* Header skeleton */}
-          <div className="flex items-center justify-between">
-            <div className="animate-pulse">
-              <div className="h-8 bg-slate-800/50 rounded w-32 mb-2" />
-              <div className="h-4 bg-slate-800/30 rounded w-48" />
-            </div>
-            <div className="h-12 bg-slate-800/50 rounded-lg w-32" />
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="animate-pulse">
+            <div className="h-8 bg-slate-800/50 rounded w-32 mb-2" />
+            <div className="h-4 bg-slate-800/30 rounded w-48" />
           </div>
-
-          {/* Grid skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50 animate-pulse">
-                <div className="h-6 bg-slate-700/50 rounded w-3/4 mb-4" />
-                <div className="h-4 bg-slate-700/50 rounded w-1/2 mb-4" />
-                <div className="flex gap-2 mb-4">
-                  <div className="h-6 bg-slate-700/50 rounded w-16" />
-                  <div className="h-6 bg-slate-700/50 rounded w-16" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="h-12 bg-slate-800/50 rounded-lg w-32" />
         </div>
-      </AdminLayout>
+
+        {/* Grid skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50 animate-pulse">
+              <div className="h-6 bg-slate-700/50 rounded w-3/4 mb-4" />
+              <div className="h-4 bg-slate-700/50 rounded w-1/2 mb-4" />
+              <div className="flex gap-2 mb-4">
+                <div className="h-6 bg-slate-700/50 rounded w-16" />
+                <div className="h-6 bg-slate-700/50 rounded w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
+    <>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -377,6 +374,6 @@ export default function AdminProjects() {
           </div>
         </motion.div>
       )}
-    </AdminLayout>
+    </>
   );
 }

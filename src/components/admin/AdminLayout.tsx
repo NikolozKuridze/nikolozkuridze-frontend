@@ -1,5 +1,4 @@
-import { ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAdminStore } from '../../store/adminStore';
 import {
@@ -16,11 +15,7 @@ import {
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface AdminLayoutProps {
-  children: ReactNode;
-}
-
-export default function AdminLayout({ children }: AdminLayoutProps) {
+export default function AdminLayout() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -226,7 +221,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           transition={{ duration: 0.5 }}
           className="max-w-7xl mx-auto"
         >
-          {children}
+          <Outlet />
         </motion.div>
       </main>
 
