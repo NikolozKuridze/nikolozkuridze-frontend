@@ -1,14 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
+import { authService } from '../services/api.service';
+import type { Admin } from '../types/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.nikolozkuridze.com';
-
-interface Admin {
-  id: string;
-  email: string;
-  name: string;
-}
 
 interface AdminState {
   admin: Admin | null;
@@ -26,44 +22,19 @@ export const useAdminStore = create<AdminState>()(
       token: null,
       isAuthenticated: false,
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      login: async (email: string, _password: string) => {
-        // MOCK LOGIN FOR TESTING - Remove when .NET API is ready
-        // This allows login with any credentials to test the UI
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-
-        const mockAdmin = {
-          id: '1',
-          email: email,
-          name: 'Admin User'
-        };
-
-        const mockToken = btoa(JSON.stringify({ email, timestamp: Date.now() }));
-
-        set({
-          admin: mockAdmin,
-          token: mockToken,
-          isAuthenticated: true
-        });
-
-        /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
+      login: async (email: string, password: string) => {
         try {
-          const response = await axios.post(`${API_URL}/auth/login`, {
-            email,
-            password
-          });
+          const response = await authService.login(email, password);
 
-          if (response.data.success) {
-            set({
-              admin: response.data.admin,
-              token: response.data.token,
-              isAuthenticated: true
-            });
-          }
-        } catch {
-          throw new Error('Invalid credentials');
+          set({
+            admin: response.admin,
+            token: response.token,
+            isAuthenticated: true
+          });
+        } catch (error) {
+          console.error('Login error:', error);
+          throw new Error(error instanceof Error ? error.message : 'Invalid credentials');
         }
-        */
       },
 
       logout: () => {
@@ -78,14 +49,16 @@ export const useAdminStore = create<AdminState>()(
         const { token } = get();
         if (!token) return false;
 
-        // MOCK TOKEN VERIFICATION - Remove when .NET API is ready
         try {
-          const decoded = JSON.parse(atob(token));
-          if (decoded.email) {
-            return true;
-          }
-          return false;
-        } catch {
+          const response = await authService.verify();
+
+          set({
+            admin: response.admin,
+            isAuthenticated: true
+          });
+          return true;
+        } catch (error) {
+          console.error('Token verification error:', error);
           set({
             admin: null,
             token: null,
@@ -93,36 +66,6 @@ export const useAdminStore = create<AdminState>()(
           });
           return false;
         }
-
-        /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
-        try {
-          const response = await axios.post(
-            `${API_URL}/auth/verify`,
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            }
-          );
-
-          if (response.data.success) {
-            set({
-              admin: response.data.admin,
-              isAuthenticated: true
-            });
-            return true;
-          }
-          return false;
-        } catch {
-          set({
-            admin: null,
-            token: null,
-            isAuthenticated: false
-          });
-          return false;
-        }
-        */
       }
     }),
     {
@@ -143,3 +86,15 @@ adminApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Add response interceptor for error handling
+adminApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      useAdminStore.getState().logout();
+    }
+    return Promise.reject(error);
+  }
+);

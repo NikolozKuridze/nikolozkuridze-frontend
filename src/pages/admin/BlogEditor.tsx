@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
+import toast from 'react-hot-toast';
+import { blogService } from '../../services/api.service';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { Save, X } from 'lucide-react';
 
@@ -15,7 +16,6 @@ interface BlogForm {
   thumbnail: string;
   published: boolean;
   featured: boolean;
-  author: string;
 }
 
 export default function BlogEditor() {
@@ -33,50 +33,34 @@ export default function BlogEditor() {
     tags: '',
     thumbnail: '',
     published: false,
-    featured: false,
-    author: 'Nikoloz Kuridze'
+    featured: false
   });
 
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
   const fetchBlog = useCallback(async () => {
-    // MOCK DATA FOR TESTING - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (!id) return;
 
-    const mockBlog = {
-      title: { en: 'Sample Blog Post', ka: 'ნიმუში ბლოგ პოსტი' },
-      slug: 'sample-blog-post',
-      description: { en: 'This is a sample blog description', ka: 'ეს არის ნიმუში აღწერა' },
-      content: { en: '<p>Sample blog content here...</p>', ka: '<p>ნიმუში შინაარსი აქ...</p>' },
-      category: 'article',
-      tags: ['react', 'javascript', 'tutorial'],
-      thumbnail: 'https://via.placeholder.com/800x400',
-      published: true,
-      featured: false,
-      author: 'Nikoloz Kuridze'
-    };
-
-    setForm({
-      ...mockBlog,
-      tags: mockBlog.tags.join(', ')
-    });
-
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
-      const response = await adminApi.get(`/blogs/${id}`);
-      const blog = response.data.blog;
+      const blog = await blogService.getById(id);
       setForm({
-        ...blog,
-        tags: blog.tags?.join(', ') || ''
+        title: blog.title,
+        slug: blog.slug,
+        description: blog.description,
+        content: blog.content,
+        category: blog.category,
+        tags: blog.tags?.join(', ') || '',
+        thumbnail: blog.thumbnail || '',
+        published: blog.published,
+        featured: blog.featured
       });
     } catch (error) {
       console.error('Error fetching blog:', error);
-      alert(t('admin.common.error'));
+      toast.error(t('admin.common.error') || 'Failed to load blog');
+      navigate('/admin/blogs');
     }
-    */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, t]);
+  }, [id, t, navigate]);
 
   useEffect(() => {
     if (isEdit) {
@@ -88,42 +72,39 @@ export default function BlogEditor() {
     e.preventDefault();
     setLoading(true);
 
-    // MOCK SAVE - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    const data = {
-      ...form,
-      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean)
+    const blogData = {
+      title: form.title,
+      slug: form.slug,
+      description: form.description,
+      content: form.content,
+      category: form.category,
+      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+      thumbnail: form.thumbnail || undefined,
+      published: form.published,
+      featured: form.featured
     };
 
-    console.log('Blog data to save:', data);
-    alert(isEdit ? 'Blog updated successfully!' : 'Blog created successfully!');
-    navigate('/admin/blogs');
-    setLoading(false);
+    const savePromise = isEdit && id
+      ? blogService.update(id, blogData)
+      : blogService.create(blogData);
 
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
-    try {
-      const data = {
-        ...form,
-        tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean)
-      };
-
-      if (isEdit) {
-        await adminApi.put(`/blogs/${id}`, data);
-        alert(t('admin.blog.updated'));
-      } else {
-        await adminApi.post('/blogs', data);
-        alert(t('admin.blog.created'));
+    toast.promise(
+      savePromise,
+      {
+        loading: isEdit ? 'Updating blog...' : 'Creating blog...',
+        success: isEdit ? 'Blog updated successfully!' : 'Blog created successfully!',
+        error: isEdit ? 'Failed to update blog' : 'Failed to create blog',
       }
+    );
 
+    try {
+      await savePromise;
       navigate('/admin/blogs');
     } catch (error) {
       console.error('Error saving blog:', error);
-      alert(t('admin.common.error'));
     } finally {
       setLoading(false);
     }
-    */
   };
 
   const generateSlug = () => {

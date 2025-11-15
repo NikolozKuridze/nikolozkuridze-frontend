@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './hooks/useTheme';
 import { Navigation } from './components/Navigation/Navigation';
 import { Hero } from './sections/Hero/Hero';
@@ -62,6 +63,33 @@ function App() {
             <Route path="projects/edit/:id" element={<ProjectEditor />} />
           </Route>
         </Routes>
+
+        {/* Toast Notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#1e293b',
+              color: '#fff',
+              border: '1px solid #334155',
+              borderRadius: '0.75rem',
+              padding: '1rem',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
       </BrowserRouter>
     </ThemeProvider>
   );

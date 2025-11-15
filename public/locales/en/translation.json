@@ -140,6 +140,65 @@
       "totalProjects": "Total Projects",
       "totalViews": "Total Views"
     },
+    "dashboard": {
+      "welcome": "Welcome back! Here's what's happening with your content.",
+      "quickActions": "Quick Actions",
+      "recentActivity": "Recent Activity",
+      "createBlog": "Create New Blog",
+      "createBlogDesc": "Write and publish a new blog post",
+      "addProject": "Add Project",
+      "addProjectDesc": "Showcase a new project",
+      "noActivity": "No recent activity yet"
+    },
+    "blogsList": {
+      "title": "Blogs",
+      "subtitle": "Manage and organize your blog content",
+      "searchPlaceholder": "Search blogs by title or slug...",
+      "filters": "Filters",
+      "status": "Status",
+      "views": "Views",
+      "published": "Published",
+      "draft": "Draft",
+      "featured": "Featured",
+      "noBlogs": "No blogs yet",
+      "noBlogsDesc": "Create your first blog post to get started",
+      "noResults": "No blogs found matching your search",
+      "tryDifferent": "Try a different search term",
+      "createFirst": "Create Your First Blog",
+      "showing": "Showing",
+      "of": "of",
+      "blogsCount": "blogs",
+      "lastUpdated": "Last updated: Today"
+    },
+    "projectsList": {
+      "title": "Projects",
+      "subtitle": "Showcase your amazing work",
+      "searchPlaceholder": "Search projects by title or category...",
+      "gridView": "Grid View",
+      "listView": "List View",
+      "demo": "Demo",
+      "github": "GitHub",
+      "noProjects": "No projects yet",
+      "noProjectsDesc": "Add your first project to get started",
+      "noResults": "No projects found matching your search",
+      "createFirst": "Create Your First Project",
+      "showing": "Showing",
+      "of": "of",
+      "projectsCount": "projects"
+    },
+    "editor": {
+      "quickActions": "Quick Actions",
+      "save": "Save",
+      "cancel": "Cancel",
+      "generateSlug": "Generate Slug",
+      "settings": "Settings",
+      "seoSettings": "SEO Settings",
+      "actions": "Actions"
+    },
+    "layout": {
+      "viewWebsite": "View Website",
+      "adminName": "Admin User"
+    },
     "common": {
       "loading": "Loading...",
       "error": "An error occurred",

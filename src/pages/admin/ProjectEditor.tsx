@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-// import { adminApi } from '../../store/adminStore'; // Will be used when .NET API is ready
+import toast from 'react-hot-toast';
+import { projectService } from '../../services/api.service';
 import { Save, X } from 'lucide-react';
 
 interface ProjectForm {
@@ -10,7 +11,7 @@ interface ProjectForm {
   longDescription: { en: string; ka: string };
   category: string;
   technologies: string;
-  image: string;
+  imageUrl: string;
   demoUrl: string;
   githubUrl: string;
   published: boolean;
@@ -30,7 +31,7 @@ export default function ProjectEditor() {
     longDescription: { en: '', ka: '' },
     category: '',
     technologies: '',
-    image: '',
+    imageUrl: '',
     demoUrl: '',
     githubUrl: '',
     published: true,
@@ -42,43 +43,29 @@ export default function ProjectEditor() {
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
   const fetchProject = useCallback(async () => {
-    // MOCK DATA FOR TESTING - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (!id) return;
 
-    const mockProject = {
-      title: { en: 'Sample Project', ka: 'ნიმუში პროექტი' },
-      description: { en: 'Sample project description', ka: 'ნიმუში პროექტის აღწერა' },
-      longDescription: { en: 'Detailed description here...', ka: 'დეტალური აღწერა აქ...' },
-      category: 'Web Development',
-      technologies: ['React', 'TypeScript', 'Node.js'],
-      image: 'https://via.placeholder.com/600x400',
-      demoUrl: 'https://demo.example.com',
-      githubUrl: 'https://github.com/example/project',
-      published: true,
-      featured: false,
-      order: 0
-    };
-
-    setForm({
-      ...mockProject,
-      technologies: mockProject.technologies.join(', ')
-    });
-
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
     try {
-      const response = await adminApi.get(`/projects/${id}`);
-      const project = response.data.project;
+      const project = await projectService.getById(id);
       setForm({
-        ...project,
-        technologies: project.technologies?.join(', ') || ''
+        title: project.title,
+        description: project.description,
+        longDescription: project.longDescription,
+        category: project.category,
+        technologies: project.technologies?.join(', ') || '',
+        imageUrl: project.imageUrl || '',
+        demoUrl: project.demoUrl || '',
+        githubUrl: project.githubUrl || '',
+        published: project.published,
+        featured: project.featured,
+        order: project.order
       });
     } catch (error) {
       console.error('Error fetching project:', error);
-      alert(t('admin.common.error'));
+      toast.error(t('admin.common.error') || 'Failed to load project');
+      navigate('/admin/projects');
     }
-    */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, t]);
+  }, [id, t, navigate]);
 
   useEffect(() => {
     if (isEdit) {
@@ -90,42 +77,41 @@ export default function ProjectEditor() {
     e.preventDefault();
     setLoading(true);
 
-    // MOCK SAVE - Remove when .NET API is ready
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    const data = {
-      ...form,
-      technologies: form.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+    const projectData = {
+      title: form.title,
+      description: form.description,
+      longDescription: form.longDescription,
+      category: form.category,
+      technologies: form.technologies.split(',').map((t) => t.trim()).filter(Boolean),
+      imageUrl: form.imageUrl || undefined,
+      demoUrl: form.demoUrl || undefined,
+      githubUrl: form.githubUrl || undefined,
+      published: form.published,
+      featured: form.featured,
+      order: form.order
     };
 
-    console.log('Project data to save:', data);
-    alert(isEdit ? 'Project updated successfully!' : 'Project created successfully!');
-    navigate('/admin/projects');
-    setLoading(false);
+    const savePromise = isEdit && id
+      ? projectService.update(id, projectData)
+      : projectService.create(projectData);
 
-    /* REAL API IMPLEMENTATION - Uncomment when .NET API is ready
-    try {
-      const data = {
-        ...form,
-        technologies: form.technologies.split(',').map((t) => t.trim()).filter(Boolean)
-      };
-
-      if (isEdit) {
-        await adminApi.put(`/projects/${id}`, data);
-        alert(t('admin.project.updated'));
-      } else {
-        await adminApi.post('/projects', data);
-        alert(t('admin.project.created'));
+    toast.promise(
+      savePromise,
+      {
+        loading: isEdit ? 'Updating project...' : 'Creating project...',
+        success: isEdit ? 'Project updated successfully!' : 'Project created successfully!',
+        error: isEdit ? 'Failed to update project' : 'Failed to create project',
       }
+    );
 
+    try {
+      await savePromise;
       navigate('/admin/projects');
     } catch (error) {
       console.error('Error saving project:', error);
-      alert(t('admin.common.error'));
     } finally {
       setLoading(false);
     }
-    */
   };
 
   return (
@@ -285,9 +271,8 @@ export default function ProjectEditor() {
               </label>
               <input
                 type="text"
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                required
+                value={form.imageUrl}
+                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                 placeholder="https://..."
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
               />
