@@ -322,7 +322,7 @@ export default function BlogEditor() {
               />
             </div>
 
-            {/* Content - FIXED: Separate editors with proper state management */}
+            {/* Content - FIXED: Only render active editor to prevent state issues */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 {t('admin.blog.content')} ({activeTab.toUpperCase()}) *
@@ -333,29 +333,28 @@ export default function BlogEditor() {
                   Content is required - please add some text
                 </p>
               )}
-              
+
               {/* Debug info in development */}
               {process.env.NODE_ENV === 'development' && (
                 <div className="mb-2 p-2 bg-slate-800 rounded text-xs text-slate-400">
                   Content length: {form.content[activeTab].length} chars
                 </div>
               )}
-              
-              {/* English Editor */}
-              <div style={{ display: activeTab === 'en' ? 'block' : 'none' }}>
+
+              {/* Conditionally render only the active editor */}
+              {activeTab === 'en' ? (
                 <RichTextEditor
+                  key="editor-en"
                   value={form.content.en}
                   onChange={handleEnglishContentChange}
                 />
-              </div>
-              
-              {/* Georgian Editor */}
-              <div style={{ display: activeTab === 'ka' ? 'block' : 'none' }}>
+              ) : (
                 <RichTextEditor
+                  key="editor-ka"
                   value={form.content.ka}
                   onChange={handleGeorgianContentChange}
                 />
-              </div>
+              )}
             </div>
           </div>
 
