@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
-:root {
-  /* High-Tech Color Palette - Light Mode */
+@theme {
+  /* Custom color palette */
   --color-primary: #0F172A;
   --color-primary-light: #1E293B;
   --color-accent: #0EA5E9;
@@ -217,6 +217,14 @@ p {
   box-shadow: var(--glass-shadow);
 }
 
+.glass-premium {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
 /* Button Base */
 .btn {
   display: inline-flex;
@@ -256,6 +264,14 @@ p {
 .btn-secondary:hover {
   background: var(--color-accent);
   color: white;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-contact {
+  margin-top: 1rem;
 }
 
 /* Animations */
