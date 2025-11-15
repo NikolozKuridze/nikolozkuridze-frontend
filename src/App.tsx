@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { Suspense } from 'react';
 import { ThemeProvider } from './hooks/useTheme';
 import { Navigation } from './components/Navigation/Navigation';
 import { Hero } from './sections/Hero/Hero';
@@ -19,6 +20,7 @@ import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import BlogsPage from './pages/BlogsPage';
 import BlogDetailPage from './pages/BlogDetailPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function HomePage() {
   return (
@@ -54,9 +56,17 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
+              <ErrorBoundary>
+                <Suspense fallback={
+                  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                    <div className="text-white text-xl">Loading...</div>
+                  </div>
+                }>
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                </Suspense>
+              </ErrorBoundary>
             }
           >
             <Route path="dashboard" element={<AdminDashboard />} />
