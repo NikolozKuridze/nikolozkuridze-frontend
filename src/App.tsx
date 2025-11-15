@@ -19,7 +19,6 @@ import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import BlogsPage from './pages/BlogsPage';
 import BlogDetailPage from './pages/BlogDetailPage';
-import './styles/globals.css';
 
 function HomePage() {
   return (
