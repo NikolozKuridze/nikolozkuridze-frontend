@@ -26,15 +26,7 @@ export default function BlogEditor() {
   const { id } = useParams();
   const isEdit = !!id;
 
-  // Loading state while translations load
-  if (!ready) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-white text-lg">Loading editor...</div>
-      </div>
-    );
-  }
-
+  // All hooks must be called before any conditional returns
   const [form, setForm] = useState<BlogForm>({
     title: { en: '', ka: '' },
     slug: '',
@@ -80,6 +72,15 @@ export default function BlogEditor() {
       fetchBlog();
     }
   }, [isEdit, fetchBlog]);
+
+  // Loading state while translations load
+  if (!ready) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-white text-lg">Loading editor...</div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
