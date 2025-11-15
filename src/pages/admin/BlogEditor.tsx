@@ -21,10 +21,19 @@ interface BlogForm {
 }
 
 export default function BlogEditor() {
-  const { t } = useTranslation();
+  const { t, ready } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+
+  // Loading state while translations load
+  if (!ready) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-white text-lg">Loading editor...</div>
+      </div>
+    );
+  }
 
   const [form, setForm] = useState<BlogForm>({
     title: { en: '', ka: '' },
