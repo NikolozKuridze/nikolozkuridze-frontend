@@ -26,6 +26,7 @@ export const useAdminStore = create<AdminState>()(
       token: null,
       isAuthenticated: false,
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       login: async (email: string, _password: string) => {
         // MOCK LOGIN FOR TESTING - Remove when .NET API is ready
         // This allows login with any credentials to test the UI
