@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -16,6 +16,7 @@ export default function BlogDetailPage() {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -62,6 +63,82 @@ export default function BlogDetailPage() {
       }
     }
   };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      // Could add toast notification here
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  };
+
+  // Enhance code blocks with copy button and language label
+  useEffect(() => {
+    if (!contentRef.current || !blog) return;
+
+    const enhanceCodeBlocks = () => {
+      const codeBlocks = contentRef.current?.querySelectorAll('pre');
+
+      codeBlocks?.forEach((pre) => {
+        // Skip if already enhanced
+        if (pre.parentElement?.classList.contains('enhanced-code-block')) return;
+
+        // Detect language from classes or attributes
+        const codeElement = pre.querySelector('code');
+        let language = 'code';
+
+        if (codeElement) {
+          const classes = codeElement.className.match(/language-(\w+)/);
+          if (classes && classes[1]) {
+            language = classes[1];
+          } else if (codeElement.className.match(/ql-syntax/)) {
+            // Try to detect from highlighted code
+            language = 'code';
+          }
+        }
+
+        // Get code text
+        const codeText = pre.textContent || '';
+
+        // Create wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'enhanced-code-block';
+
+        // Create header
+        const header = document.createElement('div');
+        header.className = 'code-header';
+
+        // Language label
+        const langLabel = document.createElement('div');
+        langLabel.className = 'code-language';
+        langLabel.textContent = language;
+
+        // Copy button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-button';
+        copyBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20"><path d="M6 17C4.89543 17 4 16.1046 4 15V5C4 3.89543 4.89543 3 6 3H13C13.7403 3 14.3866 3.4022 14.7324 4M11 21H18C19.1046 21 20 20.1046 20 19V9C20 7.89543 19.1046 7 18 7H11C9.89543 7 9 7.89543 9 9V19C9 20.1046 9.89543 21 11 21Z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+        copyBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          copyToClipboard(codeText);
+          copyBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+          setTimeout(() => {
+            copyBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20"><path d="M6 17C4.89543 17 4 16.1046 4 15V5C4 3.89543 4.89543 3 6 3H13C13.7403 3 14.3866 3.4022 14.7324 4M11 21H18C19.1046 21 20 20.1046 20 19V9C20 7.89543 19.1046 7 18 7H11C9.89543 7 9 7.89543 9 9V19C9 20.1046 9.89543 21 11 21Z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+          }, 2000);
+        };
+
+        header.appendChild(langLabel);
+        header.appendChild(copyBtn);
+
+        // Wrap the pre element
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.appendChild(header);
+        wrapper.appendChild(pre);
+      });
+    };
+
+    enhanceCodeBlocks();
+  }, [blog]);
 
   if (loading) {
     return (
@@ -201,7 +278,7 @@ export default function BlogDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <div className="blog-content" dangerouslySetInnerHTML={{ __html: content }} />
+              <div ref={contentRef} className="blog-content" dangerouslySetInnerHTML={{ __html: content }} />
 
               <div className="blog-footer">
                 <button onClick={handleShare} className="share-button">
