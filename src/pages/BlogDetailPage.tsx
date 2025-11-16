@@ -245,7 +245,7 @@ export default function BlogDetailPage() {
               <div className="blog-info">
                 <div className="blog-info__item">
                   <User size={18} />
-                  <span>{blog.author?.name || 'Nikoloz Kuridze'}</span>
+                  <span>{blog.author || 'Nikoloz Kuridze'}</span>
                 </div>
                 <div className="blog-info__item">
                   <Calendar size={18} />
