@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { projectService } from '../../services/api.service';
 import { Save, X, ArrowLeft, FolderGit2, Loader2, Globe, Github } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { Project } from '../../types/api';
 
 interface ProjectForm {
   title: { en: string; ka: string };
@@ -43,23 +44,44 @@ export default function ProjectEditor() {
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
   const fetchProject = useCallback(async () => {
-    if (!id) return;
+    if (!id || id === 'undefined') {
+      console.error('Invalid project ID:', id);
+      toast.error('Invalid project ID');
+      navigate('/admin/projects');
+      return;
+    }
 
     try {
       setInitialLoading(true);
-      const project = await projectService.getById(id);
+      console.log('Fetching project with ID:', id);
+      
+      // First get all projects and find the one we need
+      const response = await projectService.getAll();
+      // Handle both response formats
+      const projects: Project[] = Array.isArray(response) 
+        ? response 
+        : (response as any).projects || [];
+      
+      const project = projects.find((p: Project) => 
+        (p as any).id === id || (p as any)._id === id
+      );
+      
+      if (!project) {
+        throw new Error('Project not found');
+      }
+      
       setForm({
-        title: project.title,
-        description: project.description,
+        title: project.title || { en: '', ka: '' },
+        description: project.description || { en: '', ka: '' },
         longDescription: project.longDescription || { en: '', ka: '' },
-        category: project.category,
-        technologies: project.technologies?.join(', ') || '',
+        category: project.category || '',
+        technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
         image: project.image || '',
         demoUrl: project.demoUrl || '',
         githubUrl: project.githubUrl || '',
-        published: project.published,
-        featured: project.featured,
-        order: project.order
+        published: project.published ?? true,
+        featured: project.featured ?? false,
+        order: project.order || 0
       });
     } catch (error) {
       console.error('Error fetching project:', error);
@@ -71,10 +93,10 @@ export default function ProjectEditor() {
   }, [id, navigate]);
 
   useEffect(() => {
-    if (isEdit) {
+    if (isEdit && id && id !== 'undefined') {
       fetchProject();
     }
-  }, [isEdit, fetchProject]);
+  }, [isEdit, id, fetchProject]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +130,7 @@ export default function ProjectEditor() {
     };
 
     try {
-      if (isEdit && id) {
+      if (isEdit && id && id !== 'undefined') {
         await projectService.update(id, projectData);
         toast.success('Project updated successfully!');
       } else {
@@ -145,7 +167,7 @@ export default function ProjectEditor() {
     );
   }
 
-  const inputStyle = {
+  const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '12px 16px',
     background: 'rgba(15, 23, 42, 0.5)',
@@ -154,18 +176,19 @@ export default function ProjectEditor() {
     color: '#ffffff',
     fontSize: '15px',
     outline: 'none',
-    transition: 'all 0.3s'
+    transition: 'all 0.3s',
+    boxSizing: 'border-box'
   };
 
-  const labelStyle = {
+  const labelStyle: React.CSSProperties = {
     display: 'block',
     fontSize: '14px',
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#cbd5e1',
     marginBottom: '8px'
   };
 
-  const cardStyle = {
+  const cardStyle: React.CSSProperties = {
     background: '#1e293b',
     borderRadius: '12px',
     padding: '20px',
@@ -252,7 +275,7 @@ export default function ProjectEditor() {
               fontSize: '16px',
               color: '#94a3b8'
             }}>
-              {isEdit ? `Editing project ID: ${id}` : 'Showcase your amazing work'}
+              {isEdit ? 'Update your project details' : 'Showcase your amazing work'}
             </p>
           </div>
         </div>
@@ -266,11 +289,11 @@ export default function ProjectEditor() {
             borderBottom: '1px solid #334155',
             paddingBottom: '2px'
           }}>
-            {['en', 'ka'].map((lang) => (
+            {(['en', 'ka'] as const).map((lang) => (
               <button
                 key={lang}
                 type="button"
-                onClick={() => setActiveTab(lang as 'en' | 'ka')}
+                onClick={() => setActiveTab(lang)}
                 style={{
                   padding: '12px 24px',
                   background: 'transparent',
@@ -314,10 +337,10 @@ export default function ProjectEditor() {
                   style={inputStyle}
                   placeholder="Enter project title..."
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#8b5cf6';
+                    e.currentTarget.style.borderColor = '#8b5cf6';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#334155';
+                    e.currentTarget.style.borderColor = '#334155';
                   }}
                 />
               </div>
@@ -337,13 +360,13 @@ export default function ProjectEditor() {
                   }
                   required
                   rows={3}
-                  style={inputStyle}
+                  style={{...inputStyle, resize: 'vertical' as const}}
                   placeholder="Brief description of your project..."
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#8b5cf6';
+                    e.currentTarget.style.borderColor = '#8b5cf6';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#334155';
+                    e.currentTarget.style.borderColor = '#334155';
                   }}
                 />
               </div>
@@ -362,13 +385,13 @@ export default function ProjectEditor() {
                     })
                   }
                   rows={8}
-                  style={inputStyle}
+                  style={{...inputStyle, resize: 'vertical' as const}}
                   placeholder="Detailed project description, features, challenges, solutions..."
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#8b5cf6';
+                    e.currentTarget.style.borderColor = '#8b5cf6';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#334155';
+                    e.currentTarget.style.borderColor = '#334155';
                   }}
                 />
               </div>
@@ -425,8 +448,8 @@ export default function ProjectEditor() {
                   <motion.button
                     type="submit"
                     disabled={loading}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={loading ? {} : { scale: 1.02 }}
+                    whileTap={loading ? {} : { scale: 0.98 }}
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -473,7 +496,14 @@ export default function ProjectEditor() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '8px'
+                      gap: '8px',
+                      transition: 'all 0.3s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#64748b';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#475569';
                     }}
                   >
                     <X size={20} />

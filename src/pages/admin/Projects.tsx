@@ -35,7 +35,7 @@ export default function AdminProjects() {
     try {
       await projectService.delete(id);
       toast.success('Project deleted successfully!');
-      setProjects(projects.filter((p) => p._id !== id));
+      setProjects(projects.filter((p) => p.id !== id));
     } catch (error) {
       console.error('Error deleting project:', error);
       toast.error('Failed to delete project');
@@ -389,7 +389,7 @@ export default function AdminProjects() {
           }}>
             {filteredProjects.map((project, index) => (
               <motion.div
-                key={project._id}
+                key={project.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -551,7 +551,7 @@ export default function AdminProjects() {
                       display: 'flex',
                       gap: '8px'
                     }}>
-                      <Link to={`/admin/projects/edit/${project._id}`}>
+                      <Link to={`/admin/projects/edit/${project.id}`}>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -571,7 +571,7 @@ export default function AdminProjects() {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => handleDelete(project._id)}
+                        onClick={() => handleDelete(project.id)}
                         style={{
                           padding: '8px',
                           background: 'rgba(239, 68, 68, 0.1)',
@@ -665,7 +665,7 @@ export default function AdminProjects() {
               <tbody>
                 {filteredProjects.map((project, index) => (
                   <motion.tr
-                    key={project._id}
+                    key={project.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
@@ -814,7 +814,7 @@ export default function AdminProjects() {
                         justifyContent: 'flex-end',
                         gap: '8px'
                       }}>
-                        <Link to={`/admin/projects/edit/${project._id}`}>
+                        <Link to={`/admin/projects/edit/${project.id}`}>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -834,7 +834,7 @@ export default function AdminProjects() {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => handleDelete(project._id)}
+                          onClick={() => handleDelete(project.id)}
                           style={{
                             padding: '8px',
                             background: 'rgba(239, 68, 68, 0.1)',

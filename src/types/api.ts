@@ -131,7 +131,7 @@ export interface Blog {
 
 // Project Types
 export interface Project {
-  _id: string;
+  id: string;
   title: {
     en: string;
     ka: string;
