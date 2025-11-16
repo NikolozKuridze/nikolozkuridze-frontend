@@ -79,7 +79,29 @@ export interface Author {
   avatar?: string;
 }
 
-// Blog Types
+export interface BlogFormData {
+  title: {
+    en: string;
+    ka: string;
+  };
+  description: {
+    en: string;
+    ka: string;
+  };
+  content: {
+    en: string;
+    ka: string;
+  };
+  slug: string;
+  category: string;
+  tags: string[];
+  thumbnail?: string;
+  author: string; // Changed from Author object to string
+  published: boolean;
+  featured: boolean;
+}
+
+// This is how your Blog type should look when fetched from the API
 export interface Blog {
   _id: string;
   title: {
@@ -98,7 +120,7 @@ export interface Blog {
   category: string;
   tags: string[];
   thumbnail?: string;
-  author: Author;
+  author: string; // This should be string in the database
   published: boolean;
   featured: boolean;
   views: number;
@@ -106,27 +128,6 @@ export interface Blog {
   updatedAt: string;
 }
 
-export interface BlogFormData {
-  title: {
-    en: string;
-    ka: string;
-  };
-  description: {
-    en: string;
-    ka: string;
-  };
-  content: {
-    en: string;
-    ka: string;
-  };
-  slug: string;
-  category: string;
-  tags: string[];
-  thumbnail?: string;
-  author: Author;
-  published: boolean;
-  featured: boolean;
-}
 
 // Project Types
 export interface Project {

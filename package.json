@@ -14,6 +14,11 @@
     "type-check": "tsc -b"
   },
   "dependencies": {
+    "@tiptap/extension-highlight": "^3.10.7",
+    "@tiptap/extension-link": "^3.10.7",
+    "@tiptap/extension-typography": "^3.10.7",
+    "@tiptap/react": "^3.10.7",
+    "@tiptap/starter-kit": "^3.10.7",
     "axios": "^1.13.2",
     "framer-motion": "^12.6.2",
     "highlight.js": "^11.11.1",

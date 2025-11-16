@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { blogService } from '../../services/api.service';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { Save, X, Sparkles, AlertCircle } from 'lucide-react';
-import type { Author } from '../../types/api';
 
 interface BlogForm {
   title: { en: string; ka: string };
@@ -15,7 +14,7 @@ interface BlogForm {
   category: string;
   tags: string;
   thumbnail: string;
-  author: Author;
+  author: string; // Changed to string to match backend
   published: boolean;
   featured: boolean;
 }
@@ -26,6 +25,7 @@ export default function BlogEditor() {
   const { id } = useParams();
   const isEdit = !!id;
 
+  // Initialize with empty content
   const [form, setForm] = useState<BlogForm>({
     title: { en: '', ka: '' },
     slug: '',
@@ -34,7 +34,7 @@ export default function BlogEditor() {
     category: 'article',
     tags: '',
     thumbnail: '',
-    author: { name: 'Nikoloz Kuridze', bio: 'Enterprise Solution Architect', avatar: '' },
+    author: 'Nikoloz Kuridze', // Simple string
     published: false,
     featured: false
   });
@@ -42,6 +42,9 @@ export default function BlogEditor() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Keep track of content separately to avoid state issues
+  const [tempContent, setTempContent] = useState<{ en: string; ka: string }>({ en: '', ka: '' });
 
   const fetchBlog = useCallback(async () => {
     if (!id) return;
@@ -56,10 +59,11 @@ export default function BlogEditor() {
         category: blog.category,
         tags: blog.tags?.join(', ') || '',
         thumbnail: blog.thumbnail || '',
-        author: blog.author || { name: 'Nikoloz Kuridze', bio: 'Enterprise Solution Architect', avatar: '' },
+        author: typeof blog.author === 'string' ? blog.author : blog.author?.name || 'Nikoloz Kuridze',
         published: blog.published,
         featured: blog.featured
       });
+      setTempContent(blog.content);
     } catch (error) {
       console.error('Error fetching blog:', error);
       toast.error('Failed to load blog');
@@ -73,20 +77,21 @@ export default function BlogEditor() {
     }
   }, [isEdit, fetchBlog]);
 
-  // FIXED: Better content validation that handles Quill's HTML properly
+  // Sync temp content with form when switching tabs
+  useEffect(() => {
+    setTempContent(form.content);
+  }, [form.content]);
+
   const isContentEmpty = (content: string): boolean => {
     if (!content || content.trim() === '') return true;
     
-    // Remove all HTML tags and whitespace
+    // Remove HTML tags and check for actual text
     const textContent = content
-      .replace(/<br\s*\/?>/gi, '') // Remove <br> tags
-      .replace(/<p><\/p>/gi, '') // Remove empty <p> tags
-      .replace(/<p>\s*<\/p>/gi, '') // Remove <p> tags with only whitespace
-      .replace(/<[^>]*>/g, '') // Remove all other HTML tags
-      .replace(/&nbsp;/g, '') // Remove HTML entities
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, '')
+      .replace(/\s+/g, '')
       .trim();
     
-    // Check if there's any actual content
     return textContent.length === 0;
   };
 
@@ -103,116 +108,99 @@ export default function BlogEditor() {
       newErrors.descriptionEn = 'English description is required';
     }
     
-    // FIXED: Better content validation
-    const contentIsEmpty = isContentEmpty(form.content.en);
-    console.log('Content validation:', {
-      raw: form.content.en,
-      isEmpty: contentIsEmpty,
-      length: form.content.en.length
-    });
-    
-    if (contentIsEmpty) {
+    // Use tempContent for validation since it's the most up-to-date
+    if (isContentEmpty(tempContent.en)) {
       newErrors.contentEn = 'English content is required';
     }
     
-    if (!form.author.name.trim()) {
-      newErrors.authorName = 'Author name is required';
+    if (!form.author.trim()) {
+      newErrors.author = 'Author name is required';
     }
 
     setErrors(newErrors);
+    
+    if (Object.keys(newErrors).length > 0) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Log current form state for debugging
-    console.log('Form submission attempted:', {
-      titleEn: form.title.en,
-      contentEn: form.content.en,
-      contentEnLength: form.content.en.length,
-      slug: form.slug
-    });
+    // Update form with latest content before validation
+    const finalForm = {
+      ...form,
+      content: tempContent
+    };
     
+    // Validate with the final form data
     if (!validateForm()) {
       toast.error('Please fill in all required fields');
-      // Scroll to top to show errors
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     setLoading(true);
 
     const blogData = {
-      title: form.title,
-      slug: form.slug,
-      description: form.description,
-      content: form.content,
-      category: form.category,
-      tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
-      thumbnail: form.thumbnail || undefined,
-      author: form.author,
-      published: form.published,
-      featured: form.featured
+      title: finalForm.title,
+      slug: finalForm.slug,
+      description: finalForm.description,
+      content: tempContent, // Use tempContent which has the latest values
+      category: finalForm.category,
+      tags: finalForm.tags.split(',').map((t) => t.trim()).filter(Boolean),
+      thumbnail: finalForm.thumbnail || undefined,
+      author: finalForm.author, // Now it's a string as expected by backend
+      published: finalForm.published,
+      featured: finalForm.featured
     };
 
-    console.log('Submitting blog data:', blogData);
-
-    const savePromise = isEdit && id
-      ? blogService.update(id, blogData)
-      : blogService.create(blogData);
-
-    toast.promise(
-      savePromise,
-      {
-        loading: isEdit ? 'Updating blog...' : 'Creating blog...',
-        success: isEdit ? 'Blog updated successfully!' : 'Blog created successfully!',
-        error: (err) => {
-          console.error('Save error:', err);
-          return err?.message || (isEdit ? 'Failed to update blog' : 'Failed to create blog');
-        },
-      }
-    );
+    console.log('Submitting blog data:', {
+      ...blogData,
+      contentEnLength: blogData.content.en.length,
+      contentKaLength: blogData.content.ka.length
+    });
 
     try {
-      await savePromise;
+      if (isEdit && id) {
+        await blogService.update(id, blogData);
+        toast.success('Blog updated successfully!');
+      } else {
+        await blogService.create(blogData);
+        toast.success('Blog created successfully!');
+      }
       navigate('/admin/blogs');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving blog:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to save blog';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const generateSlug = () => {
-    setForm(prevForm => {
-      const slug = prevForm.title.en
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      return { ...prevForm, slug };
-    });
+    const slug = form.title.en
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    setForm(prev => ({ ...prev, slug }));
   };
 
-  // FIXED: Update content handlers with functional state updates to avoid stale closures
-  const handleEnglishContentChange = (value: string) => {
-    console.log('English content changed:', { length: value.length, value: value.substring(0, 100) });
-    setForm(prevForm => ({
-      ...prevForm,
-      content: { ...prevForm.content, en: value }
-    }));
-    // Clear error when content is added
-    if (!isContentEmpty(value) && errors.contentEn) {
-      setErrors(prevErrors => ({ ...prevErrors, contentEn: '' }));
+  // Handle content changes - update tempContent directly
+  const handleContentChange = (lang: 'en' | 'ka', value: string) => {
+    console.log(`Content updated for ${lang}:`, value.length);
+    setTempContent(prev => ({ ...prev, [lang]: value }));
+    
+    // Clear error if content is now valid
+    if (lang === 'en' && !isContentEmpty(value) && errors.contentEn) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.contentEn;
+        return newErrors;
+      });
     }
-  };
-
-  const handleGeorgianContentChange = (value: string) => {
-    console.log('Georgian content changed:', { length: value.length, value: value.substring(0, 100) });
-    setForm(prevForm => ({
-      ...prevForm,
-      content: { ...prevForm.content, ka: value }
-    }));
   };
 
   return (
@@ -229,16 +217,19 @@ export default function BlogEditor() {
         <Sparkles className="w-8 h-8 text-emerald-400 animate-pulse" />
       </div>
 
+      {/* Errors Display */}
       {Object.keys(errors).length > 0 && (
-        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start space-x-3">
-          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-red-400 font-semibold mb-1">Please fix the following errors:</p>
-            <ul className="text-red-300 text-sm space-y-1">
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>• {error}</li>
-              ))}
-            </ul>
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+          <div className="flex items-start space-x-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-red-400 font-semibold mb-1">Please fix the following errors:</p>
+              <ul className="text-red-300 text-sm space-y-1">
+                {Object.entries(errors).map(([key, error]) => (
+                  <li key={key}>• {error}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}
@@ -246,34 +237,23 @@ export default function BlogEditor() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Language Tabs */}
         <div className="flex space-x-2 border-b border-slate-700">
-          <button
-            type="button"
-            onClick={() => setActiveTab('en')}
-            className={`px-6 py-3 font-medium transition-colors relative ${
-              activeTab === 'en'
-                ? 'text-emerald-400'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            {t('admin.common.english')}
-            {activeTab === 'en' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('ka')}
-            className={`px-6 py-3 font-medium transition-colors relative ${
-              activeTab === 'ka'
-                ? 'text-emerald-400'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            {t('admin.common.georgian')}
-            {activeTab === 'ka' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
-            )}
-          </button>
+          {['en', 'ka'].map((lang) => (
+            <button
+              key={lang}
+              type="button"
+              onClick={() => setActiveTab(lang as 'en' | 'ka')}
+              className={`px-6 py-3 font-medium transition-colors relative ${
+                activeTab === lang
+                  ? 'text-emerald-400'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {lang === 'en' ? t('admin.common.english') : t('admin.common.georgian')}
+              {activeTab === lang && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600" />
+              )}
+            </button>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -287,14 +267,11 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.title[activeTab]}
-                onChange={(e) =>
-                  setForm(prevForm => ({
-                    ...prevForm,
-                    title: { ...prevForm.title, [activeTab]: e.target.value }
-                  }))
-                }
+                onChange={(e) => setForm(prev => ({
+                  ...prev,
+                  title: { ...prev.title, [activeTab]: e.target.value }
+                }))}
                 onBlur={() => activeTab === 'en' && !form.slug && generateSlug()}
-                required
                 className={`w-full px-4 py-3 bg-slate-900/50 border ${
                   errors.titleEn && activeTab === 'en' ? 'border-red-500' : 'border-slate-600'
                 } rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
@@ -309,13 +286,10 @@ export default function BlogEditor() {
               </label>
               <textarea
                 value={form.description[activeTab]}
-                onChange={(e) =>
-                  setForm(prevForm => ({
-                    ...prevForm,
-                    description: { ...prevForm.description, [activeTab]: e.target.value }
-                  }))
-                }
-                required
+                onChange={(e) => setForm(prev => ({
+                  ...prev,
+                  description: { ...prev.description, [activeTab]: e.target.value }
+                }))}
                 rows={3}
                 className={`w-full px-4 py-3 bg-slate-900/50 border ${
                   errors.descriptionEn && activeTab === 'en' ? 'border-red-500' : 'border-slate-600'
@@ -324,38 +298,33 @@ export default function BlogEditor() {
               />
             </div>
 
-            {/* Content - FIXED: Only render active editor to prevent state issues */}
+            {/* Content Editor */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 {t('admin.blog.content')} ({activeTab.toUpperCase()}) *
               </label>
+              
               {errors.contentEn && activeTab === 'en' && (
-                <p className="text-red-400 text-sm mb-2 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
-                  Content is required - please add some text
-                </p>
-              )}
-
-              {/* Debug info in development */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mb-2 p-2 bg-slate-800 rounded text-xs text-slate-400">
-                  Content length: {form.content[activeTab].length} chars
+                <div className="mb-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  <p className="text-red-400 text-sm flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.contentEn}
+                  </p>
                 </div>
               )}
 
-              {/* Conditionally render only the active editor */}
-              {activeTab === 'en' ? (
-                <RichTextEditor
-                  key="editor-en"
-                  value={form.content.en}
-                  onChange={handleEnglishContentChange}
-                />
-              ) : (
-                <RichTextEditor
-                  key="editor-ka"
-                  value={form.content.ka}
-                  onChange={handleGeorgianContentChange}
-                />
+              <RichTextEditor
+                value={tempContent[activeTab]}
+                onChange={(value) => handleContentChange(activeTab, value)}
+                placeholder={`Write your ${activeTab === 'en' ? 'English' : 'Georgian'} content here...`}
+              />
+
+              {/* Debug info */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-2 p-2 bg-slate-800 rounded text-xs text-slate-400">
+                  Content ({activeTab}): {tempContent[activeTab].length} chars
+                  {isContentEmpty(tempContent[activeTab]) && ' - EMPTY'}
+                </div>
               )}
             </div>
           </div>
@@ -363,7 +332,7 @@ export default function BlogEditor() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Actions */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 sticky top-4">
               <h3 className="text-white font-semibold mb-4 flex items-center space-x-2">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
                 <span>{t('admin.editor.actions')}</span>
@@ -375,7 +344,7 @@ export default function BlogEditor() {
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
                 >
                   <Save className="w-5 h-5" />
-                  <span>{loading ? t('admin.common.loading') : t('admin.blog.save')}</span>
+                  <span>{loading ? 'Saving...' : t('admin.blog.save')}</span>
                 </button>
                 <button
                   type="button"
@@ -396,8 +365,7 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.slug}
-                onChange={(e) => setForm(prevForm => ({ ...prevForm, slug: e.target.value }))}
-                required
+                onChange={(e) => setForm(prev => ({ ...prev, slug: e.target.value }))}
                 className={`w-full px-4 py-2 bg-slate-900/50 border ${
                   errors.slug ? 'border-red-500' : 'border-slate-600'
                 } rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
@@ -419,7 +387,7 @@ export default function BlogEditor() {
               </label>
               <select
                 value={form.category}
-                onChange={(e) => setForm(prevForm => ({ ...prevForm, category: e.target.value }))}
+                onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value }))}
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="tutorial">Tutorial</option>
@@ -437,7 +405,7 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.tags}
-                onChange={(e) => setForm(prevForm => ({ ...prevForm, tags: e.target.value }))}
+                onChange={(e) => setForm(prev => ({ ...prev, tags: e.target.value }))}
                 placeholder="react, javascript, tutorial"
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
@@ -452,7 +420,7 @@ export default function BlogEditor() {
               <input
                 type="text"
                 value={form.thumbnail}
-                onChange={(e) => setForm(prevForm => ({ ...prevForm, thumbnail: e.target.value }))}
+                onChange={(e) => setForm(prev => ({ ...prev, thumbnail: e.target.value }))}
                 placeholder="https://..."
                 className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
@@ -460,81 +428,45 @@ export default function BlogEditor() {
 
             {/* Author */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <h3 className="text-white font-semibold mb-4">{t('admin.blog.author')} *</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    value={form.author.name}
-                    onChange={(e) => setForm(prevForm => ({
-                      ...prevForm,
-                      author: { ...prevForm.author, name: e.target.value }
-                    }))}
-                    required
-                    placeholder="John Doe"
-                    className={`w-full px-4 py-2 bg-slate-900/50 border ${
-                      errors.authorName ? 'border-red-500' : 'border-slate-600'
-                    } rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    value={form.author.bio || ''}
-                    onChange={(e) => setForm(prevForm => ({
-                      ...prevForm,
-                      author: { ...prevForm.author, bio: e.target.value }
-                    }))}
-                    rows={2}
-                    placeholder="Short bio..."
-                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Avatar URL
-                  </label>
-                  <input
-                    type="text"
-                    value={form.author.avatar || ''}
-                    onChange={(e) => setForm(prevForm => ({
-                      ...prevForm,
-                      author: { ...prevForm.author, avatar: e.target.value }
-                    }))}
-                    placeholder="https://..."
-                    className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-              </div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                {t('admin.blog.author')} *
+              </label>
+              <input
+                type="text"
+                value={form.author}
+                onChange={(e) => setForm(prev => ({ ...prev, author: e.target.value }))}
+                className={`w-full px-4 py-2 bg-slate-900/50 border ${
+                  errors.author ? 'border-red-500' : 'border-slate-600'
+                } rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                placeholder="Author name"
+              />
+              {errors.author && (
+                <p className="text-red-400 text-xs mt-1">{errors.author}</p>
+              )}
             </div>
 
             {/* Settings */}
             <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 space-y-4">
               <h3 className="text-white font-semibold">{t('admin.editor.settings')}</h3>
 
-              <label className="flex items-center space-x-3 cursor-pointer group">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.published}
-                  onChange={(e) => setForm(prevForm => ({ ...prevForm, published: e.target.checked }))}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                  onChange={(e) => setForm(prev => ({ ...prev, published: e.target.checked }))}
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500"
                 />
-                <span className="text-slate-300 group-hover:text-white transition-colors">{t('admin.blog.published')}</span>
+                <span className="text-slate-300">{t('admin.blog.published')}</span>
               </label>
 
-              <label className="flex items-center space-x-3 cursor-pointer group">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.featured}
-                  onChange={(e) => setForm(prevForm => ({ ...prevForm, featured: e.target.checked }))}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                  onChange={(e) => setForm(prev => ({ ...prev, featured: e.target.checked }))}
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-emerald-500"
                 />
-                <span className="text-slate-300 group-hover:text-white transition-colors">{t('admin.blog.featured')}</span>
+                <span className="text-slate-300">{t('admin.blog.featured')}</span>
               </label>
             </div>
           </div>
