@@ -103,7 +103,7 @@ export interface BlogFormData {
 
 // This is how your Blog type should look when fetched from the API
 export interface Blog {
-  _id: string;
+  id: string;
   title: {
     en: string;
     ka: string;

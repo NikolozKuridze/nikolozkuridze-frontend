@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { blogService } from '../../services/api.service';
-import { Plus, Edit, Trash2, Eye, BookOpen, Search, Filter, Calendar } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Edit, Trash2, Eye, Search, FileText, Calendar, ArrowLeft, BookOpen, Home } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { Blog } from '../../types/api';
 
 export default function AdminBlogs() {
-  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchBlogs = useCallback(async () => {
     try {
@@ -18,286 +18,584 @@ export default function AdminBlogs() {
       setBlogs(data);
     } catch (error) {
       console.error('Error fetching blogs:', error);
-      toast.error(t('admin.common.error') || 'Failed to load blogs');
+      toast.error('Failed to load blogs');
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchBlogs();
   }, [fetchBlogs]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(t('admin.blog.confirmDelete'))) return;
-
-    const deletePromise = blogService.delete(id);
-
-    toast.promise(
-      deletePromise,
-      {
-        loading: 'Deleting blog...',
-        success: 'Blog deleted successfully!',
-        error: 'Failed to delete blog',
-      }
-    );
+    if (!window.confirm('Are you sure you want to delete this blog?')) return;
 
     try {
-      await deletePromise;
-      setBlogs(blogs.filter((b) => b._id !== id));
+      await blogService.delete(id);
+      toast.success('Blog deleted successfully!');
+      setBlogs(blogs.filter((b) => b.id !== id));
     } catch (error) {
       console.error('Error deleting blog:', error);
+      toast.error('Failed to delete blog');
     }
   };
 
-  const [searchQuery, setSearchQuery] = useState('');
-
   const filteredBlogs = blogs.filter(blog => {
-    const title = blog.title[i18n.language as 'en' | 'ka'] || blog.title.en;
+    const title = blog.title.en || '';
     return title.toLowerCase().includes(searchQuery.toLowerCase()) ||
            blog.slug.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        {/* Header skeleton */}
-        <div className="flex items-center justify-between">
-          <div className="animate-pulse">
-            <div className="h-8 bg-slate-800/50 rounded w-32 mb-2" />
-            <div className="h-4 bg-slate-800/30 rounded w-48" />
-          </div>
-          <div className="h-12 bg-slate-800/50 rounded-lg w-32" />
-        </div>
-
-        {/* Search skeleton */}
-        <div className="h-12 bg-slate-800/30 rounded-xl animate-pulse" />
-
-        {/* Table skeleton */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl border border-slate-700/50 overflow-hidden animate-pulse">
-          <div className="p-6 space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <div className="h-16 bg-slate-700/50 rounded flex-1" />
-              </div>
-            ))}
-          </div>
-        </div>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'transparent'
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          border: '3px solid #334155',
+          borderTopColor: '#3b82f6',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
-    <>
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4"
-      >
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent mb-2">
-            {t('admin.blogsList.title')}
-          </h1>
-          <p className="text-slate-400 text-lg">
-            {t('admin.blogsList.subtitle')}
-          </p>
-        </div>
-        <Link to="/admin/blogs/new">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center space-x-2 px-6 py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl hover:from-sky-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-sky-500/20 font-semibold"
+    <div style={{
+      minHeight: '100vh',
+      width: '100%',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '32px 24px'
+      }}>
+        
+        {/* Breadcrumb Navigation */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginBottom: '24px'
+        }}>
+          <button
+            onClick={() => navigate('/admin/dashboard')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              color: '#94a3b8',
+              fontSize: '14px',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#334155';
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#1e293b';
+              e.currentTarget.style.color = '#94a3b8';
+            }}
           >
-            <Plus className="w-5 h-5" />
-            <span>{t('admin.blog.create')}</span>
-          </motion.button>
-        </Link>
-      </motion.div>
-
-      {/* Search and Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="mb-6 flex flex-col md:flex-row gap-4"
-      >
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder={t('admin.blogsList.searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition-all"
-          />
+            <ArrowLeft size={16} />
+            Back to Dashboard
+          </button>
+          
+          <span style={{ color: '#64748b' }}>•</span>
+          
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: '#64748b',
+            fontSize: '14px'
+          }}>
+            <Home size={16} />
+            <span>/</span>
+            <span>Admin</span>
+            <span>/</span>
+            <span style={{ color: '#ffffff', fontWeight: '500' }}>Blogs</span>
+          </div>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="flex items-center space-x-2 px-6 py-3.5 bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-xl text-slate-300 hover:text-white hover:border-slate-600/50 transition-all"
-        >
-          <Filter className="w-5 h-5" />
-          <span className="font-medium">{t('admin.blogsList.filters')}</span>
-        </motion.button>
-      </motion.div>
+        
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '32px'
+        }}>
+          <div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '8px'
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <BookOpen size={24} style={{ color: '#3b82f6' }} />
+              </div>
+              <h1 style={{
+                fontSize: '32px',
+                fontWeight: '700',
+                color: '#ffffff'
+              }}>
+                Blog Management
+              </h1>
+            </div>
+            <p style={{
+              fontSize: '16px',
+              color: '#94a3b8',
+              paddingLeft: '60px'
+            }}>
+              Create and manage your blog posts
+            </p>
+          </div>
+          
+          <Link to="/admin/blogs/new" style={{ textDecoration: 'none' }}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontSize: '15px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                boxShadow: '0 10px 30px rgba(59, 130, 246, 0.3)'
+              }}
+            >
+              <Plus size={20} />
+              Create New Blog
+            </motion.button>
+          </Link>
+        </div>
 
-      {/* Blog Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-slate-800/30 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden"
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        {/* Stats Bar */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '16px',
+          marginBottom: '24px'
+        }}>
+          {[
+            { label: 'Total Blogs', value: blogs.length, color: '#3b82f6' },
+            { label: 'Published', value: blogs.filter(b => b.published).length, color: '#10b981' },
+            { label: 'Drafts', value: blogs.filter(b => !b.published).length, color: '#f59e0b' },
+            { label: 'Featured', value: blogs.filter(b => b.featured).length, color: '#8b5cf6' }
+          ].map((stat, index) => (
+            <div
+              key={index}
+              style={{
+                background: '#1e293b',
+                border: '1px solid #334155',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#94a3b8',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {stat.label}
+                </p>
+                <p style={{
+                  fontSize: '24px',
+                  fontWeight: '700',
+                  color: '#ffffff'
+                }}>
+                  {stat.value}
+                </p>
+              </div>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: stat.color
+              }} />
+            </div>
+          ))}
+        </div>
+
+        {/* Search Bar */}
+        <div style={{
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            position: 'relative',
+            maxWidth: '400px'
+          }}>
+            <Search size={20} style={{
+              position: 'absolute',
+              left: '16px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#64748b'
+            }} />
+            <input
+              type="text"
+              placeholder="Search blogs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 12px 12px 48px',
+                background: '#1e293b',
+                border: '1px solid #334155',
+                borderRadius: '12px',
+                color: '#ffffff',
+                fontSize: '15px',
+                outline: 'none'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#334155';
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Blogs Table */}
+        <div style={{
+          background: '#1e293b',
+          borderRadius: '16px',
+          border: '1px solid #334155',
+          overflow: 'hidden'
+        }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse'
+          }}>
             <thead>
-              <tr className="border-b border-slate-700/50 bg-slate-800/30">
-                <th className="text-left px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
-                  {t('admin.blog.title')}
+              <tr style={{
+                borderBottom: '1px solid #334155'
+              }}>
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#94a3b8',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Title
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
-                  {t('admin.blog.category')}
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#94a3b8',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Category
                 </th>
-                <th className="text-center px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
-                  {t('admin.blogsList.status')}
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#94a3b8',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Status
                 </th>
-                <th className="text-center px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
-                  <div className="flex items-center justify-center space-x-1">
-                    <Eye className="w-4 h-4" />
-                    <span>{t('admin.blogsList.views')}</span>
-                  </div>
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#94a3b8',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Views
                 </th>
-                <th className="text-right px-6 py-4 text-slate-300 font-semibold text-sm uppercase tracking-wider">
-                  {t('admin.common.actions')}
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'right',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#94a3b8',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Actions
                 </th>
               </tr>
             </thead>
             <tbody>
-              <AnimatePresence>
-                {filteredBlogs.map((blog, index) => (
+              {filteredBlogs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{
+                    padding: '48px',
+                    textAlign: 'center'
+                  }}>
+                    <FileText size={48} style={{
+                      color: '#334155',
+                      margin: '0 auto 16px'
+                    }} />
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#64748b',
+                      marginBottom: '24px'
+                    }}>
+                      No blogs found
+                    </p>
+                    <Link to="/admin/blogs/new" style={{ textDecoration: 'none' }}>
+                      <button style={{
+                        background: '#3b82f6',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 20px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}>
+                        Create Your First Blog
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+              ) : (
+                filteredBlogs.map((blog, index) => (
                   <motion.tr
-                    key={blog._id}
-                    initial={{ opacity: 0, y: 20 }}
+                    key={blog.id}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
                     transition={{ delay: index * 0.05 }}
-                    className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-all duration-200 group"
+                    style={{
+                      borderBottom: '1px solid #334155',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(30, 41, 59, 0.5)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
                   >
-                    <td className="px-6 py-5">
+                    <td style={{
+                      padding: '20px 24px'
+                    }}>
                       <div>
-                        <p className="text-white font-semibold mb-1 group-hover:text-sky-400 transition-colors">
-                          {blog.title[i18n.language as 'en' | 'ka'] || blog.title.en}
+                        <p style={{
+                          fontSize: '15px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          marginBottom: '4px'
+                        }}>
+                          {blog.title.en}
                         </p>
-                        <p className="text-sm text-slate-500 font-mono">/{blog.slug}</p>
+                        <p style={{
+                          fontSize: '13px',
+                          color: '#64748b'
+                        }}>
+                          /{blog.slug}
+                        </p>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <span className="inline-flex px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                        {t(`admin.blog.categories.${blog.category}`)}
+                    <td style={{
+                      padding: '20px 24px'
+                    }}>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '4px 12px',
+                        background: 'rgba(139, 92, 246, 0.1)',
+                        color: '#a78bfa',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '500'
+                      }}>
+                        {blog.category}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center justify-center space-x-2">
-                        {blog.published ? (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 animate-pulse" />
-                            {t('admin.blogsList.published')}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-500/10 text-slate-300 border border-slate-500/20">
-                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2" />
-                            {t('admin.blogsList.draft')}
-                          </span>
-                        )}
-                        {blog.featured && (
-                          <span className="inline-flex px-2 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                            ⭐
-                          </span>
-                        )}
+                    <td style={{
+                      padding: '20px 24px',
+                      textAlign: 'center'
+                    }}>
+                      {blog.published ? (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '4px 12px',
+                          background: 'rgba(16, 185, 129, 0.1)',
+                          color: '#10b981',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '500'
+                        }}>
+                          <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: '#10b981'
+                          }} />
+                          Published
+                        </span>
+                      ) : (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '4px 12px',
+                          background: 'rgba(100, 116, 139, 0.1)',
+                          color: '#64748b',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '500'
+                        }}>
+                          <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: '#64748b'
+                          }} />
+                          Draft
+                        </span>
+                      )}
+                    </td>
+                    <td style={{
+                      padding: '20px 24px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}>
+                        <Eye size={16} style={{ color: '#64748b' }} />
+                        <span style={{
+                          fontSize: '15px',
+                          fontWeight: '600',
+                          color: '#ffffff'
+                        }}>
+                          {blog.views.toLocaleString()}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-center">
-                      <div className="flex items-center justify-center space-x-2">
-                        <Eye className="w-4 h-4 text-slate-400" />
-                        <span className="text-slate-300 font-semibold">{blog.views.toLocaleString()}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Link to={`/admin/blogs/edit/${blog._id}`}>
+                    <td style={{
+                      padding: '20px 24px'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: '8px'
+                      }}>
+                        <Link to={`/admin/blogs/edit/${blog.id}`}>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            className="p-2.5 text-sky-400 hover:bg-sky-500/10 rounded-lg transition-colors border border-transparent hover:border-sky-500/20"
+                            style={{
+                              padding: '8px',
+                              background: 'rgba(59, 130, 246, 0.1)',
+                              border: '1px solid rgba(59, 130, 246, 0.2)',
+                              borderRadius: '8px',
+                              color: '#3b82f6',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
                           >
-                            <Edit className="w-5 h-5" />
+                            <Edit size={18} />
                           </motion.button>
                         </Link>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => handleDelete(blog._id)}
-                          className="p-2.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+                          onClick={() => handleDelete(blog.id)}
+                          style={{
+                            padding: '8px',
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            borderRadius: '8px',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 size={18} />
                         </motion.button>
                       </div>
                     </td>
                   </motion.tr>
-                ))}
-              </AnimatePresence>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        {filteredBlogs.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
-            <div className="inline-flex p-6 rounded-2xl bg-slate-800/30 mb-4">
-              <BookOpen className="w-12 h-12 text-slate-600" />
+        {/* Footer Stats */}
+        {filteredBlogs.length > 0 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: '24px',
+            fontSize: '14px',
+            color: '#64748b'
+          }}>
+            <span>
+              Showing {filteredBlogs.length} of {blogs.length} blogs
+            </span>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <Calendar size={16} />
+              <span>Last updated today</span>
             </div>
-            <p className="text-slate-400 text-lg mb-2">
-              {searchQuery ? t('admin.blogsList.noResults') : t('admin.blogsList.noBlogs')}
-            </p>
-            <p className="text-slate-500 text-sm">
-              {searchQuery ? t('admin.blogsList.tryDifferent') : t('admin.blogsList.noBlogsDesc')}
-            </p>
-            {!searchQuery && (
-              <Link to="/admin/blogs/new">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="mt-6 px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-sky-500/20"
-                >
-                  {t('admin.blogsList.createFirst')}
-                </motion.button>
-              </Link>
-            )}
-          </motion.div>
+          </div>
         )}
-      </motion.div>
-
-      {/* Stats Footer */}
-      {filteredBlogs.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-6 flex items-center justify-between text-sm text-slate-400"
-        >
-          <div className="flex items-center space-x-4">
-            <span>{t('admin.blogsList.showing')} {filteredBlogs.length} {t('admin.blogsList.of')} {blogs.length} {t('admin.blogsList.blogsCount')}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4" />
-            <span>{t('admin.blogsList.lastUpdated')}</span>
-          </div>
-        </motion.div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }

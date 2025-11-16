@@ -165,7 +165,7 @@ export default function BlogsPage() {
 
                     return (
                       <motion.div
-                        key={blog._id}
+                        key={blog.id}
                         className="blog-card-page glass"
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}

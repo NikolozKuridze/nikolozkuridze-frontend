@@ -1,212 +1,519 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAdminStore } from '../../store/adminStore';
-import { Lock, Mail, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Lock, Mail, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function AdminLogin() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const login = useAdminStore((state) => state.login);
+  const isAuthenticated = useAdminStore((state) => state.isAuthenticated);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Check if already authenticated and redirect
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Add a small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        navigate('/admin/dashboard', { replace: true });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setError('');
+    
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    
     setLoading(true);
 
     try {
       await login(email, password);
-      navigate('/admin/dashboard');
-    } catch {
-      setError(t('admin.login.error'));
-    } finally {
+      
+      // Force a page reload to ensure the dashboard renders properly
+      // This is a workaround for the rendering issue
+      setTimeout(() => {
+        window.location.href = '/admin/dashboard';
+      }, 100);
+      
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Invalid email or password');
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
-        />
+  // If authenticated, show loading while redirecting
+  if (isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '3px solid rgba(59, 130, 246, 0.3)',
+            borderTopColor: '#3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ color: '#94a3b8', fontSize: '16px' }}>
+            Redirecting to dashboard...
+          </p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
+    );
+  }
 
-      <div className="w-full max-w-md p-8 relative z-10">
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      {/* Animated background elements */}
+      <div style={{
+        position: 'absolute',
+        top: '-200px',
+        left: '-200px',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+        animation: 'float 20s ease-in-out infinite'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-200px',
+        right: '-200px',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
+        animation: 'float 25s ease-in-out infinite reverse'
+      }} />
+      
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -30px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          width: '100%',
+          maxWidth: '440px',
+          padding: '32px',
+          position: 'relative',
+          zIndex: 10
+        }}
+      >
+        {/* Logo/Header */}
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+          style={{ textAlign: 'center', marginBottom: '40px' }}
+        >
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '80px',
+            height: '80px',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+            marginBottom: '24px',
+            boxShadow: '0 20px 40px rgba(59, 130, 246, 0.3)'
+          }}>
+            <ShieldCheck size={40} style={{ color: '#ffffff' }} />
+          </div>
+          
+          <h1 style={{
+            fontSize: '32px',
+            fontWeight: '700',
+            color: '#ffffff',
+            marginBottom: '8px',
+            letterSpacing: '-0.5px'
+          }}>
+            Admin Login
+          </h1>
+          <p style={{
+            fontSize: '14px',
+            color: '#94a3b8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#10b981',
+              display: 'inline-block',
+              animation: 'pulse 2s infinite'
+            }} />
+            nikolozkuridze.com
+          </p>
+        </motion.div>
+
+        {/* Login Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ delay: 0.3 }}
+          style={{
+            background: 'rgba(30, 41, 59, 0.8)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            padding: '32px',
+            border: '1px solid rgba(51, 65, 85, 0.5)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+          }}
         >
-          {/* Logo/Header */}
-          <div className="text-center mb-8">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 mb-6 shadow-lg shadow-sky-500/30"
-            >
-              <ShieldCheck className="w-10 h-10 text-white" />
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-4xl font-bold bg-gradient-to-r from-white via-sky-100 to-white bg-clip-text text-transparent mb-2"
-            >
-              {t('admin.login.title')}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-slate-400 font-medium flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 text-sky-400" />
-              nikolozkuridze.com
-            </motion.p>
-          </div>
-
-          {/* Login Form */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-slate-800/30 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-slate-700/50 relative overflow-hidden"
-          >
-            {/* Gradient border effect */}
-            <div className="absolute inset-0 bg-gradient-to-b from-sky-500/10 via-transparent to-purple-500/10 pointer-events-none" />
-
-            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-              {/* Error Message */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl flex items-center space-x-3"
-                >
-                  <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-                  <span className="font-medium">{error}</span>
-                </motion.div>
-              )}
-
-              {/* Email Input */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  {t('admin.login.email')}
-                </label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-sky-400 transition-colors" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition-all"
-                    placeholder="admin@example.com"
-                  />
-                </div>
-              </div>
-
-              {/* Password Input */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  {t('admin.login.password')}
-                </label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-sky-400 transition-colors" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 transition-all"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <motion.button
-                type="submit"
-                disabled={loading}
-                whileHover={{ scale: loading ? 1 : 1.02 }}
-                whileTap={{ scale: loading ? 1 : 0.98 }}
-                className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-4 rounded-xl font-bold hover:from-sky-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-sky-500/20 flex items-center justify-center space-x-2 group"
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
               >
-                {loading ? (
-                  <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                    />
-                    <span>{t('admin.common.loading')}</span>
-                  </>
-                ) : (
-                  <>
-                    <span>{t('admin.login.submit')}</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </motion.button>
-            </form>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  animation: 'pulse 2s infinite'
+                }} />
+                <span style={{
+                  fontSize: '14px',
+                  color: '#f87171',
+                  fontWeight: '500'
+                }}>
+                  {error}
+                </span>
+              </motion.div>
+            )}
 
-            {/* Security Notice */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mt-6 pt-6 border-t border-slate-700/50"
-            >
-              <div className="flex items-center justify-center space-x-2 text-xs text-slate-500">
-                <Lock className="w-3.5 h-3.5" />
-                <span>Secured with industry-standard encryption</span>
+            {/* Email Input */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#cbd5e1',
+                marginBottom: '8px'
+              }}>
+                Email Address
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Mail size={20} style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#64748b',
+                  pointerEvents: 'none'
+                }} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px 14px 48px',
+                    background: 'rgba(15, 23, 42, 0.5)',
+                    border: '1px solid rgba(51, 65, 85, 0.5)',
+                    borderRadius: '12px',
+                    color: '#ffffff',
+                    fontSize: '15px',
+                    outline: 'none',
+                    transition: 'all 0.3s',
+                    boxSizing: 'border-box'
+                  }}
+                  placeholder="admin@example.com"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#3b82f6';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(51, 65, 85, 0.5)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
 
-          {/* Footer */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="mt-8 text-center"
-          >
-            <p className="text-slate-500 text-sm">
-              © 2024 Nikoloz Kuridze. All rights reserved.
-            </p>
-          </motion.div>
+            {/* Password Input */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#cbd5e1',
+                marginBottom: '8px'
+              }}>
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Lock size={20} style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#64748b',
+                  pointerEvents: 'none'
+                }} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  style={{
+                    width: '100%',
+                    padding: '14px 48px 14px 48px',
+                    background: 'rgba(15, 23, 42, 0.5)',
+                    border: '1px solid rgba(51, 65, 85, 0.5)',
+                    borderRadius: '12px',
+                    color: '#ffffff',
+                    fontSize: '15px',
+                    outline: 'none',
+                    transition: 'all 0.3s',
+                    boxSizing: 'border-box'
+                  }}
+                  placeholder="••••••••"
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#3b82f6';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(51, 65, 85, 0.5)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#64748b',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.3s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#94a3b8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#64748b';
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer'
+              }}>
+                <input
+                  type="checkbox"
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                />
+                <span style={{
+                  fontSize: '14px',
+                  color: '#94a3b8'
+                }}>
+                  Remember me
+                </span>
+              </label>
+              <a 
+                href="#" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Add forgot password logic here if needed
+                }}
+                style={{
+                  fontSize: '14px',
+                  color: '#3b82f6',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  transition: 'color 0.3s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#60a5fa';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#3b82f6';
+                }}
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            {/* Submit Button */}
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={loading ? {} : { scale: 1.02 }}
+              whileTap={loading ? {} : { scale: 0.98 }}
+              style={{
+                width: '100%',
+                padding: '16px',
+                background: loading 
+                  ? 'linear-gradient(135deg, #64748b, #475569)'
+                  : 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#ffffff',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: loading 
+                  ? 'none'
+                  : '0 10px 30px rgba(59, 130, 246, 0.3)',
+                transition: 'all 0.3s'
+              }}
+            >
+              {loading ? (
+                <>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    borderTopColor: '#ffffff',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite'
+                  }} />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign in to Dashboard</span>
+                  <ArrowRight size={20} />
+                </>
+              )}
+            </motion.button>
+          </form>
+
+          {/* Security Notice */}
+          <div style={{
+            marginTop: '24px',
+            paddingTop: '24px',
+            borderTop: '1px solid rgba(51, 65, 85, 0.5)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              fontSize: '12px',
+              color: '#64748b'
+            }}>
+              <Lock size={14} />
+              <span>Secured with industry-standard encryption</span>
+            </div>
+          </div>
         </motion.div>
-      </div>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          style={{
+            marginTop: '32px',
+            textAlign: 'center'
+          }}
+        >
+          <p style={{
+            fontSize: '14px',
+            color: '#64748b'
+          }}>
+            © 2024 Nikoloz Kuridze. All rights reserved.
+          </p>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

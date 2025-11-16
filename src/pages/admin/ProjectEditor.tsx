@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { projectService } from '../../services/api.service';
-import { Save, X } from 'lucide-react';
+import { Save, X, ArrowLeft, FolderGit2, Loader2, Globe, Github } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ProjectForm {
   title: { en: string; ka: string };
@@ -20,7 +20,6 @@ interface ProjectForm {
 }
 
 export default function ProjectEditor() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
@@ -40,12 +39,14 @@ export default function ProjectEditor() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'en' | 'ka'>('en');
 
   const fetchProject = useCallback(async () => {
     if (!id) return;
 
     try {
+      setInitialLoading(true);
       const project = await projectService.getById(id);
       setForm({
         title: project.title,
@@ -62,10 +63,12 @@ export default function ProjectEditor() {
       });
     } catch (error) {
       console.error('Error fetching project:', error);
-      toast.error(t('admin.common.error') || 'Failed to load project');
+      toast.error('Failed to load project');
       navigate('/admin/projects');
+    } finally {
+      setInitialLoading(false);
     }
-  }, [id, t, navigate]);
+  }, [id, navigate]);
 
   useEffect(() => {
     if (isEdit) {
@@ -75,6 +78,17 @@ export default function ProjectEditor() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!form.title.en.trim()) {
+      toast.error('English title is required');
+      return;
+    }
+    if (!form.category.trim()) {
+      toast.error('Category is required');
+      return;
+    }
+
     setLoading(true);
 
     const projectData = {
@@ -93,262 +107,537 @@ export default function ProjectEditor() {
       order: form.order
     };
 
-    const savePromise = isEdit && id
-      ? projectService.update(id, projectData)
-      : projectService.create(projectData);
-
-    toast.promise(
-      savePromise,
-      {
-        loading: isEdit ? 'Updating project...' : 'Creating project...',
-        success: isEdit ? 'Project updated successfully!' : 'Project created successfully!',
-        error: isEdit ? 'Failed to update project' : 'Failed to create project',
-      }
-    );
-
     try {
-      await savePromise;
+      if (isEdit && id) {
+        await projectService.update(id, projectData);
+        toast.success('Project updated successfully!');
+      } else {
+        await projectService.create(projectData);
+        toast.success('Project created successfully!');
+      }
       navigate('/admin/projects');
     } catch (error) {
       console.error('Error saving project:', error);
+      toast.error('Failed to save project');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          {isEdit ? t('admin.project.edit') : t('admin.project.create')}
-        </h1>
+  if (initialLoading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <Loader2 size={48} style={{ 
+            color: '#8b5cf6', 
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ color: '#94a3b8', fontSize: '16px' }}>Loading project...</p>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
+    );
+  }
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Language Tabs */}
-        <div className="flex space-x-2 border-b border-slate-700">
+  const inputStyle = {
+    width: '100%',
+    padding: '12px 16px',
+    background: 'rgba(15, 23, 42, 0.5)',
+    border: '1px solid #334155',
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '15px',
+    outline: 'none',
+    transition: 'all 0.3s'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#cbd5e1',
+    marginBottom: '8px'
+  };
+
+  const cardStyle = {
+    background: '#1e293b',
+    borderRadius: '12px',
+    padding: '20px',
+    border: '1px solid #334155',
+    marginBottom: '16px'
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      width: '100%',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '32px 24px'
+      }}>
+        
+        {/* Navigation */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          marginBottom: '24px'
+        }}>
           <button
-            type="button"
-            onClick={() => setActiveTab('en')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'en'
-                ? 'text-sky-400 border-b-2 border-sky-400'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            onClick={() => navigate('/admin/projects')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              color: '#94a3b8',
+              fontSize: '14px',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#334155';
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#1e293b';
+              e.currentTarget.style.color = '#94a3b8';
+            }}
           >
-            {t('admin.common.english')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('ka')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'ka'
-                ? 'text-sky-400 border-b-2 border-sky-400'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            {t('admin.common.georgian')}
+            <ArrowLeft size={16} />
+            Back to Projects
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.title')} ({activeTab.toUpperCase()})
-              </label>
-              <input
-                type="text"
-                value={form.title[activeTab]}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    title: { ...form.title, [activeTab]: e.target.value }
-                  })
-                }
-                required
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
+        {/* Header */}
+        <div style={{
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <FolderGit2 size={24} style={{ color: '#ffffff' }} />
+          </div>
+          <div>
+            <h1 style={{
+              fontSize: '32px',
+              fontWeight: '700',
+              color: '#ffffff',
+              marginBottom: '4px'
+            }}>
+              {isEdit ? 'Edit Project' : 'Add New Project'}
+            </h1>
+            <p style={{
+              fontSize: '16px',
+              color: '#94a3b8'
+            }}>
+              {isEdit ? `Editing project ID: ${id}` : 'Showcase your amazing work'}
+            </p>
+          </div>
+        </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.description')} ({activeTab.toUpperCase()})
-              </label>
-              <textarea
-                value={form.description[activeTab]}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: { ...form.description, [activeTab]: e.target.value }
-                  })
-                }
-                required
-                rows={3}
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-
-            {/* Long Description */}
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.longDescription')} ({activeTab.toUpperCase()})
-              </label>
-              <textarea
-                value={form.longDescription[activeTab]}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    longDescription: { ...form.longDescription, [activeTab]: e.target.value }
-                  })
-                }
-                rows={6}
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
+        <form onSubmit={handleSubmit}>
+          {/* Language Tabs */}
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            marginBottom: '24px',
+            borderBottom: '1px solid #334155',
+            paddingBottom: '2px'
+          }}>
+            {['en', 'ka'].map((lang) => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => setActiveTab(lang as 'en' | 'ka')}
+                style={{
+                  padding: '12px 24px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: activeTab === lang ? '#8b5cf6' : '#94a3b8',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  borderBottom: activeTab === lang ? '2px solid #8b5cf6' : '2px solid transparent',
+                  marginBottom: '-2px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {lang === 'en' ? 'English' : 'Georgian'}
+              </button>
+            ))}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Actions */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <h3 className="text-white font-semibold mb-4">Actions</h3>
-              <div className="space-y-3">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:from-sky-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50"
-                >
-                  <Save className="w-5 h-5" />
-                  <span>{loading ? t('admin.common.loading') : t('admin.project.save')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/admin/projects')}
-                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all duration-300"
-                >
-                  <X className="w-5 h-5" />
-                  <span>{t('admin.project.cancel')}</span>
-                </button>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr',
+            gap: '24px'
+          }}>
+            {/* Main Content */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Title */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Title ({activeTab.toUpperCase()}) *
+                </label>
+                <input
+                  type="text"
+                  value={form.title[activeTab]}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      title: { ...form.title, [activeTab]: e.target.value }
+                    })
+                  }
+                  required
+                  style={inputStyle}
+                  placeholder="Enter project title..."
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#8b5cf6';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#334155';
+                  }}
+                />
+              </div>
+
+              {/* Description */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Short Description ({activeTab.toUpperCase()}) *
+                </label>
+                <textarea
+                  value={form.description[activeTab]}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      description: { ...form.description, [activeTab]: e.target.value }
+                    })
+                  }
+                  required
+                  rows={3}
+                  style={inputStyle}
+                  placeholder="Brief description of your project..."
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#8b5cf6';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#334155';
+                  }}
+                />
+              </div>
+
+              {/* Long Description */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Detailed Description ({activeTab.toUpperCase()})
+                </label>
+                <textarea
+                  value={form.longDescription[activeTab]}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      longDescription: { ...form.longDescription, [activeTab]: e.target.value }
+                    })
+                  }
+                  rows={8}
+                  style={inputStyle}
+                  placeholder="Detailed project description, features, challenges, solutions..."
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#8b5cf6';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#334155';
+                  }}
+                />
+              </div>
+
+              {/* Image Preview */}
+              {form.image && (
+                <div style={cardStyle}>
+                  <label style={labelStyle}>
+                    Image Preview
+                  </label>
+                  <div style={{
+                    width: '100%',
+                    height: '300px',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    background: `url(${form.image}) center/cover`,
+                    position: 'relative'
+                  }}>
+                    {!form.image.startsWith('http') && (
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(0, 0, 0, 0.5)'
+                      }}>
+                        <p style={{ color: '#ffffff' }}>Invalid image URL</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Actions */}
+              <div style={{
+                ...cardStyle,
+                background: 'linear-gradient(135deg, #1e293b, #334155)',
+                position: 'sticky',
+                top: '24px'
+              }}>
+                <h3 style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  marginBottom: '16px'
+                }}>
+                  Actions
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      background: loading 
+                        ? 'linear-gradient(135deg, #64748b, #475569)'
+                        : 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save size={20} />
+                        <span>{isEdit ? 'Update Project' : 'Create Project'}</span>
+                      </>
+                    )}
+                  </motion.button>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/admin/projects')}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      background: '#475569',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <X size={20} />
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Category */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Category *
+                </label>
+                <input
+                  type="text"
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  required
+                  placeholder="Enterprise, Financial, AI/ML, etc."
+                  style={inputStyle}
+                />
+              </div>
+
+              {/* Technologies */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Technologies
+                </label>
+                <input
+                  type="text"
+                  value={form.technologies}
+                  onChange={(e) => setForm({ ...form, technologies: e.target.value })}
+                  placeholder="React, Node.js, MongoDB"
+                  style={inputStyle}
+                />
+                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                  Comma separated
+                </p>
+              </div>
+
+              {/* Image URL */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Image URL
+                </label>
+                <input
+                  type="text"
+                  value={form.image}
+                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  placeholder="https://..."
+                  style={inputStyle}
+                />
+              </div>
+
+              {/* Links */}
+              <div style={cardStyle}>
+                <h3 style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  marginBottom: '16px'
+                }}>
+                  Project Links
+                </h3>
+                
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Globe size={16} style={{ color: '#3b82f6' }} />
+                    Demo URL
+                  </label>
+                  <input
+                    type="text"
+                    value={form.demoUrl}
+                    onChange={(e) => setForm({ ...form, demoUrl: e.target.value })}
+                    placeholder="https://..."
+                    style={inputStyle}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Github size={16} style={{ color: '#64748b' }} />
+                    GitHub URL
+                  </label>
+                  <input
+                    type="text"
+                    value={form.githubUrl}
+                    onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
+                    placeholder="https://github.com/..."
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+
+              {/* Order */}
+              <div style={cardStyle}>
+                <label style={labelStyle}>
+                  Display Order
+                </label>
+                <input
+                  type="number"
+                  value={form.order}
+                  onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
+                  min="0"
+                  style={inputStyle}
+                />
+                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                  Lower numbers appear first
+                </p>
+              </div>
+
+              {/* Settings */}
+              <div style={cardStyle}>
+                <h3 style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#ffffff',
+                  marginBottom: '16px'
+                }}>
+                  Visibility Settings
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={form.published}
+                      onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span style={{ color: '#cbd5e1' }}>Published</span>
+                  </label>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={form.featured}
+                      onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span style={{ color: '#cbd5e1' }}>Featured</span>
+                  </label>
+                </div>
               </div>
             </div>
-
-            {/* Category */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.category')}
-              </label>
-              <input
-                type="text"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                required
-                placeholder="Enterprise, Financial, AI/ML, etc."
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-
-            {/* Technologies */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.technologies')}
-              </label>
-              <input
-                type="text"
-                value={form.technologies}
-                onChange={(e) => setForm({ ...form, technologies: e.target.value })}
-                placeholder="React, Node.js, MongoDB"
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-              <p className="text-xs text-slate-400 mt-2">Comma separated</p>
-            </div>
-
-            {/* Image URL */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.image')}
-              </label>
-              <input
-                type="text"
-                value={form.image}
-                onChange={(e) => setForm({ ...form, image: e.target.value })}
-                placeholder="https://..."
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-
-            {/* Demo URL */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.demoUrl')}
-              </label>
-              <input
-                type="text"
-                value={form.demoUrl}
-                onChange={(e) => setForm({ ...form, demoUrl: e.target.value })}
-                placeholder="https://..."
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-
-            {/* GitHub URL */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.githubUrl')}
-              </label>
-              <input
-                type="text"
-                value={form.githubUrl}
-                onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
-                placeholder="https://github.com/..."
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-
-            {/* Order */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                {t('admin.project.order')}
-              </label>
-              <input
-                type="number"
-                value={form.order}
-                onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
-                min="0"
-                className="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-
-            {/* Settings */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700 space-y-4">
-              <h3 className="text-white font-semibold">Settings</h3>
-
-              <label className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.published}
-                  onChange={(e) => setForm({ ...form, published: e.target.checked })}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-sky-500 focus:ring-2 focus:ring-sky-500"
-                />
-                <span className="text-slate-300">{t('admin.project.published')}</span>
-              </label>
-
-              <label className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.featured}
-                  onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-sky-500 focus:ring-2 focus:ring-sky-500"
-                />
-                <span className="text-slate-300">{t('admin.project.featured')}</span>
-              </label>
-            </div>
           </div>
-        </div>
-      </form>
-    </>
+        </form>
+      </div>
+    </div>
   );
 }

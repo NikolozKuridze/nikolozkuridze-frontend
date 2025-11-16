@@ -90,7 +90,7 @@ export const Blogs = () => {
 
             return (
               <motion.div
-                key={blog._id}
+                key={blog.id}
                 className="blog-card glass"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
