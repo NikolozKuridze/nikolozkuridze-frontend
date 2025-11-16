@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { blogService } from '../../services/api.service';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { Save, X, Sparkles, AlertCircle } from 'lucide-react';
+import type { AxiosError } from "axios";
 
 interface BlogForm {
   title: { en: string; ka: string };
@@ -59,7 +60,7 @@ export default function BlogEditor() {
         category: blog.category,
         tags: blog.tags?.join(', ') || '',
         thumbnail: blog.thumbnail || '',
-        author: typeof blog.author === 'string' ? blog.author : blog.author?.name || 'Nikoloz Kuridze',
+        author: blog.author,
         published: blog.published,
         featured: blog.featured
       });
@@ -171,11 +172,19 @@ export default function BlogEditor() {
         toast.success('Blog created successfully!');
       }
       navigate('/admin/blogs');
-    } catch (error: any) {
-      console.error('Error saving blog:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to save blog';
-      toast.error(errorMessage);
-    } finally {
+    } catch (error: unknown) {
+  const err = error as AxiosError<{ message?: string }>;
+
+  console.error("Error saving blog:", error);
+
+  const errorMessage =
+    err.response?.data?.message ||
+    err.message ||
+    "Failed to save blog";
+
+  toast.error(errorMessage);
+}
+ finally {
       setLoading(false);
     }
   };
