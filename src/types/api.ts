@@ -128,7 +128,6 @@ export interface Blog {
   updatedAt: string;
 }
 
-
 // Project Types
 export interface Project {
   id: string;

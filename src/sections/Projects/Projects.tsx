@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, ExternalLink, Github } from 'lucide-react';
 import { projectService } from '../../services/api.service';
-import type { Project } from '../../types/api';
+import type { Project, ProjectsResponse } from '../../types/api';
 import './Projects.css';
 
 export const Projects = () => {
@@ -18,9 +18,9 @@ export const Projects = () => {
     try {
       const response = await projectService.getAll();
       // Handle the API response structure
-      const projectsList: Project[] = Array.isArray(response) 
-        ? response 
-        : (response as any).projects || [];
+ const projectsList: Project[] = Array.isArray(response) 
+  ? response 
+  : (response as ProjectsResponse).projects || [];
       
       // Only show published projects on the public site
       const publishedProjects = projectsList.filter((project: Project) => project.published);
@@ -141,7 +141,7 @@ export const Projects = () => {
             ) : (
               filteredProjects.map((project, index) => (
                 <motion.div
-                  key={(project as any).id || project.id}
+                  key={(project as Project).id || project.id}
                   className="project-card glass"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}

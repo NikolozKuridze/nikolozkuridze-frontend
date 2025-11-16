@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { projectService } from '../../services/api.service';
 import { Save, X, ArrowLeft, FolderGit2, Loader2, Globe, Github } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { Project } from '../../types/api';
+import type { Project ,ProjectsResponse} from '../../types/api'; 
 
 interface ProjectForm {
   title: { en: string; ka: string };
@@ -60,11 +60,10 @@ export default function ProjectEditor() {
       // Handle both response formats
       const projects: Project[] = Array.isArray(response) 
         ? response 
-        : (response as any).projects || [];
+        : (response as ProjectsResponse).projects || [];
       
-      const project = projects.find((p: Project) => 
-        (p as any).id === id || (p as any)._id === id
-      );
+      const project = projects.find((p: Project) => p.id === id);
+
       
       if (!project) {
         throw new Error('Project not found');
