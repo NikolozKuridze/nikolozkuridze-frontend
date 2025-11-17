@@ -16,7 +16,7 @@ export const Projects = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await projectService.getAll();
+      const response = await projectService.getPublished();
       // Handle the API response structure
  const projectsList: Project[] = Array.isArray(response) 
   ? response 

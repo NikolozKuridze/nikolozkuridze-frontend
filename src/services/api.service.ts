@@ -166,6 +166,16 @@ export const projectService = {
     return response.data.projects;
   },
 
+   getPublished: async (): Promise<Project[]> => {
+    const response = await adminApi.get<ProjectsResponse>('/projects');
+
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to fetch projects');
+    }
+
+    return response.data.projects;
+  },
+
   getById: async (id: string): Promise<Project> => {
     const response = await adminApi.get<ProjectResponse>(`/projects/${id}`);
 
